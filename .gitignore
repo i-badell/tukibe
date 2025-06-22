@@ -1,0 +1,78 @@
+.idea/
+## Build results
+bin/
+obj/
+[Bb]uild/
+[Ll]ogs/
+
+## User-specific files
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+## Visual Studio Code
+.vscode/
+.vscode-test/
+
+## Rider / JetBrains / Resharper / .idea
+.idea/
+*.sln.iml
+*.DotSettings.user
+
+## Visual Studio
+.vs/
+*.dbmdl
+*.dbproj.schemaview
+*.pdb
+*.cache
+*.csproj.user
+*.pidb
+*.psess
+*.vsp
+*.vspx
+*.vspscc
+*.vssscc
+*.scc
+*.orig
+*.vsix
+*.vsixmanifest
+*.testsettings
+*.vsmdi
+TestResults/
+*.publish.xml
+
+## ASP.NET stuff
+wwwroot/
+*.db
+*.mdf
+*.ldf
+
+## Configuration
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+.env
+
+## NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Others
+_ReSharper*/
+*.sln.cache
+*.sln.docstates
+*.coverage
+*.coveragexml
+*.log
+
+## OS-specific
+.DS_Store
+Thumbs.db
+desktop.ini
+
