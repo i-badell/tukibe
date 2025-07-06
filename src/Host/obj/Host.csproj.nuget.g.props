@@ -7,7 +7,7 @@
     <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">/Users/ibadell/.nuget/packages/</NuGetPackageRoot>
     <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">/Users/ibadell/.nuget/packages/</NuGetPackageFolders>
     <NuGetProjectStyle Condition=" '$(NuGetProjectStyle)' == '' ">PackageReference</NuGetProjectStyle>
-    <NuGetToolVersion Condition=" '$(NuGetToolVersion)' == '' ">6.10.1</NuGetToolVersion>
+    <NuGetToolVersion Condition=" '$(NuGetToolVersion)' == '' ">6.13.2</NuGetToolVersion>
   </PropertyGroup>
   <ItemGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
     <SourceRoot Include="/Users/ibadell/.nuget/packages/" />
@@ -18,7 +18,7 @@
     <Import Project="$(NuGetPackageRoot)aspire.dashboard.sdk.osx-arm64/8.2.2/buildTransitive/Aspire.Dashboard.Sdk.osx-arm64.props" Condition="Exists('$(NuGetPackageRoot)aspire.dashboard.sdk.osx-arm64/8.2.2/buildTransitive/Aspire.Dashboard.Sdk.osx-arm64.props')" />
   </ImportGroup>
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <PkgGrpc_Tools Condition=" '$(PkgGrpc_Tools)' == '' ">/Users/ibadell/.nuget/packages/grpc.tools/2.67.0</PkgGrpc_Tools>
+    <PkgGrpc_Tools Condition=" '$(PkgGrpc_Tools)' == '' ">/Users/ibadell/.nuget/packages/grpc.tools/2.72.0</PkgGrpc_Tools>
     <PkgAspire_Hosting_Orchestration_osx-arm64 Condition=" '$(PkgAspire_Hosting_Orchestration_osx-arm64)' == '' ">/Users/ibadell/.nuget/packages/aspire.hosting.orchestration.osx-arm64/8.2.2</PkgAspire_Hosting_Orchestration_osx-arm64>
     <PkgAspire_Dashboard_Sdk_osx-arm64 Condition=" '$(PkgAspire_Dashboard_Sdk_osx-arm64)' == '' ">/Users/ibadell/.nuget/packages/aspire.dashboard.sdk.osx-arm64/8.2.2</PkgAspire_Dashboard_Sdk_osx-arm64>
   </PropertyGroup>
