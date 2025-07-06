@@ -1,5 +1,13 @@
+using Aspire.Hosting;
+using Aspire.Hosting.ApplicationModel;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
-builder.AddProject<Projects.Api>("Api");
+var sql = builder.AddSqlServer("tuki").WithLifetime(ContainerLifetime.Persistent);
+var db = sql.AddDatabase("client");
+
+builder.AddProject<Projects.Api>("Api")
+  .WithReference(db)
+  .WaitFor(db);
 
 builder.Build().Run();
