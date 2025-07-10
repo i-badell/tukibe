@@ -1,9 +1,20 @@
+using Api.Context;
+using Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
+// DI
+builder.Services.AddScoped<IEventService, EventService>();
+
+// SQL Server
+builder.AddSqlServerDbContext<ClientContext>("tuki-db");
+builder.EnrichSqlServerDbContext<ClientContext>();
+
+
+// AUthorization
 builder.Services
     .AddAuthorization()
     .AddAuthentication(options =>
@@ -17,12 +28,11 @@ builder.Services
         options.Audience = config["Auth0Config:Audience"];
     });
 
-// Add Swagger services
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
-    // Add JWT Bearer support in Swagger UI
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -48,16 +58,17 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddControllers();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.MapGet("/secure", () => "Authenticated!").RequireAuthorization();
+app.MapControllers();
 
 app.UseHttpsRedirection();
 
