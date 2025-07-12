@@ -1,4 +1,6 @@
+using Api.Dto;
 using Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -14,12 +16,17 @@ public class EventController : ControllerBase
         _eventDataService = eventDataService;
     }
 
-    [HttpGet("{id:guid}/products")]
-    public async Task<IActionResult> GetFullEventData(Guid id)
+    [Authorize]
+    [HttpGet("{eventId:guid}/products")]
+    [ProducesResponseType<ProductResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetFullEventData(Guid eventId)
     {
-        var data = await _eventDataService.GetEventProducts(id);
+        var data = await _eventDataService.GetEventProducts(eventId);
         if (data == null)
+        {
             return NotFound();
+        }
         return Ok(data);
     }
 }

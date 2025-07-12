@@ -13,11 +13,11 @@ public class EventService : IEventService
         _context = context;
     }
 
-    public async Task<EventProducts?> GetEventProducts(Guid eventId)
+    public async Task<ProductResponse?> GetEventProducts(Guid eventId)
     {
         return await _context.Events
             .Where(e => e.Id == eventId)
-            .Select(e => new EventProducts
+            .Select(e => new ProductResponse
             {
                 EventId = e.Id,
                 Catalogs = e.Catalogs
