@@ -20,6 +20,12 @@ public class ClientContext : DbContext
             .HasForeignKey(c => c.StandId)
             .IsRequired(false);
 
+        modelBuilder.Entity<Catalog>()
+          .HasOne(e => e.Event)
+          .WithOne(c => c.Catalog)
+          .HasForeignKey<Catalog>(x => x.EventId)
+          .IsRequired(false);
+
         modelBuilder.Entity<Product>()
           .Property(m => m.Price)
           .HasPrecision(18, 2);
@@ -33,11 +39,6 @@ public class ClientContext : DbContext
             .HasMany(e => e.Stands)
             .WithMany(s => s.Events)
             .UsingEntity(join => join.ToTable("EventStands"));
-
-        modelBuilder.Entity<Event>()
-            .HasMany(e => e.Catalogs)
-            .WithMany(c => c.Events)
-            .UsingEntity(join => join.ToTable("EventCatalogs"));
 
         base.OnModelCreating(modelBuilder);
     }

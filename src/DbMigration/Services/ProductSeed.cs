@@ -35,8 +35,9 @@ public class ProductSeed
                 ImageUrl = $"https://example.com/images/producto{i}.jpg"
             });
         }
-        eventEntity.Catalogs.Add(mainCatalog);
-        mainCatalog.Events.Add(eventEntity);
+        eventEntity.Catalog = mainCatalog;
+        mainCatalog.Event = eventEntity;
+        mainCatalog.EventId = eventEntity.Id;
 
         var standNames = new[]
         {
@@ -75,9 +76,10 @@ public class ProductSeed
             stand.Catalogs.Add(standCatalog);
 
             eventEntity.Stands.Add(stand);
-            eventEntity.Catalogs.Add(standCatalog);
+            eventEntity.Catalog = standCatalog;
 
-            standCatalog.Events.Add(eventEntity);
+            standCatalog.Event = eventEntity;
+            standCatalog.EventId = eventEntity.Id;
         }
 
         _context.Events.Add(eventEntity);
