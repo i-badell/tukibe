@@ -14,6 +14,13 @@ public class ProductSeed
 
     public async Task SeedSampleEventAsync(Guid eventId)
     {
+        var dbEvent = _context.Events.FirstOrDefault(x => x.Id == eventId);
+        if (dbEvent is not null)
+        {
+            _context.Events.Remove(dbEvent);
+            await _context.SaveChangesAsync();
+        }
+
         var eventEntity = new Event
         {
             Id = eventId

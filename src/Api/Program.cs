@@ -1,7 +1,7 @@
 using Api.Context;
 using Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.OpenApi.Models;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -28,35 +28,8 @@ builder.Services
         options.Audience = config["Auth0Config:Audience"];
     });
 
-// Swagger
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        In = ParameterLocation.Header,
-        Description = "Please enter JWT with Bearer into field. Example: 'Bearer {token}'",
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
-
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[] {}
-        }
-    });
-});
+// OpenApi 
+builder.Services.AddOpenApi("v1", opt => opt.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
 
 builder.Services.AddControllers();
 
@@ -64,8 +37,19 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
+    app.MapScalarApiReference(opt =>
+    {
+        opt.WithTheme(ScalarTheme.Moon)
+          .WithDefaultHttpClient(ScalarTarget.JavaScript, ScalarClient.Fetch)
+          .AddPreferredSecuritySchemes("Bearer")
+          .WithPersistentAuthentication();
+
+        opt.Authentication = new ScalarAuthenticationOptions
+        {
+            PreferredSecuritySchemes = ["Bearer"]
+        };
+    });
 }
 
 app.MapControllers();

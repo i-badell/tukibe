@@ -1,5 +1,6 @@
 using Api.Context;
 using Api.Dto;
+using Api.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.Services;
@@ -21,22 +22,7 @@ public class EventService : IEventService
             .Select(e => new ProductResponse
             {
                 EventId = e.Id,
-                Catalogs = e.Catalog == null ? null : new CatalogDto
-                {
-                    CatalogId = e.Catalog.Id,
-                    Products = e.Catalog.Products
-                        .Select(p => new ProductDto
-                        {
-                            ProductId = p.Id,
-                            Name = p.Name,
-                            Description = p.Description,
-                            InStock = p.InStock,
-                            Price = p.Price,
-                            ImageUrl = p.ImageUrl
-                        })
-                        .ToList()
-
-                },
+                Catalog = e.Catalog == null ? new() : e.Catalog.Products.ToDto(),
                 Stands = e.Stands
                     .Select(s => new StandDto
                     {
@@ -46,17 +32,7 @@ public class EventService : IEventService
                             .Select(c => new CatalogDto
                             {
                                 CatalogId = c.Id,
-                                Products = c.Products
-                                    .Select(p => new ProductDto
-                                    {
-                                        ProductId = p.Id,
-                                        Name = p.Name,
-                                        Description = p.Description,
-                                        InStock = p.InStock,
-                                        Price = p.Price,
-                                        ImageUrl = p.ImageUrl
-                                    })
-                                    .ToList()
+                                Products = c.Products.ToDto()
                             })
                             .ToList()
                     })
@@ -64,4 +40,22 @@ public class EventService : IEventService
             })
             .FirstOrDefaultAsync();
     }
+}
+
+public static class Mappers
+{
+    public static List<ProductDto> ToDto(this IEnumerable<Product> products) =>
+      products
+        .Where(p => p.InStock)
+        .Select(p => p.ToDto())
+        .ToList();
+
+    public static ProductDto ToDto(this Product product) => new ProductDto
+    {
+        ProductId = product.Id,
+        Name = product.Name,
+        Description = product.Description,
+        Price = product.Price,
+        ImageUrl = product.ImageUrl
+    };
 }
