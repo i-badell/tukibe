@@ -2,14 +2,11 @@ namespace Api.Models;
 
 public class Catalog
 {
-    public Guid Id { get; set; }
-
-    public Guid? StandId { get; set; }
-    public Stand? Stand { get; set; }
-
-    public Guid? EventId { get; set; }
-    public Event? Event { get; set; }
-
-    public ICollection<Product> Products { get; set; } = new List<Product>();
+    public Guid StandId { get; set; }
+    public required Stand Stand { get; set; }
+    public Guid ProductId { get; set; }
+    public required Product Product { get; set; }
+    public bool InStock { get; set; }
+    public decimal Price { get; set; }
 }
 

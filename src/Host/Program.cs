@@ -4,9 +4,8 @@ using Scalar.Aspire;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var sql = builder.AddSqlServer("tuki-db").WithLifetime(ContainerLifetime.Persistent);
+var sql = builder.AddSqlServer("tuki-db").WithLifetime(ContainerLifetime.Persistent).WithHostPort(1234);
 var db = sql.AddDatabase("client");
-
 
 var migration = builder.AddProject<Projects.DbMigration>("DbMigration")
   .WithReference(sql)

@@ -17,76 +17,85 @@ public class ProductSeed
         var dbEvent = _context.Events.FirstOrDefault(x => x.Id == eventId);
         if (dbEvent is not null)
         {
-            _context.Events.Remove(dbEvent);
-            await _context.SaveChangesAsync();
+            return;
         }
 
         var eventEntity = new Event
         {
-            Id = eventId
+            Id = eventId,
+            Name = $"Event {eventId}",
+            ImageUrl = $"https://example.com/images/event_{eventId}.jpg"
         };
 
-        var mainCatalog = new Catalog
+        var category_1 = new Category
         {
-            Id = Guid.NewGuid()
+            Id = Guid.NewGuid(),
+            Name = "Comida"
         };
-        for (int i = 1; i <= 10; i++)
+        
+        var category_2 = new Category
         {
-            mainCatalog.Products.Add(new Product
-            {
-                Id = Guid.NewGuid(),
-                Name = $"Producto {i}",
-                Description = $"Descripción del producto {i}",
-                InStock = true,
-                Price = 100 + i * 5,
-                ImageUrl = $"https://example.com/images/producto{i}.jpg"
-            });
-        }
-        eventEntity.Catalog = mainCatalog;
-        mainCatalog.Event = eventEntity;
-        mainCatalog.EventId = eventEntity.Id;
+            Id = Guid.NewGuid(),
+            Name = "Bebida"                      
+        };
+
+        _context.Categories.Add(category_1);
+        _context.Categories.Add(category_2);
 
         var standNames = new[]
         {
-                "Stand de Jugos",
-                "Stand de Empanadas",
-                "Stand de Postres"
-            };
+            "Stand de Jugos",
+            "Stand de Empanadas",
+            "Stand de Postres"
+        };
 
         foreach (var standName in standNames)
         {
-            var stand = new Stand
-            {
+            var stand = new Stand 
+            { 
                 Id = Guid.NewGuid(),
-                Name = standName
+                Name = standName,
+                ImageUrl = $"https://example.com/images/{standName.Replace(" ", "").ToLower()}.jpg",
+                Event = eventEntity,                
             };
 
-            var standCatalog = new Catalog
+            for (int j = 1; j <= 10; j++)
             {
-                Id = Guid.NewGuid(),
-                Stand = stand
-            };
-
-            for (int j = 1; j <= 5; j++)
-            {
-                standCatalog.Products.Add(new Product
+                stand.Catalogs.Add(new Catalog
                 {
-                    Id = Guid.NewGuid(),
-                    Name = $"Producto {j} - {standName}",
-                    Description = $"Delicioso {standName} número {j}",
+                    Stand = stand,
+                    Product = new Product
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = $"Producto {j} - {standName}",
+                        Description = $"Delicioso {standName} número {j}",
+                        Category = category_1,
+                        ImageUrl = $"https://example.com/images/{standName.Replace(" ", "").ToLower()}_{j}.jpg"
+                    },
                     InStock = true,
-                    Price = 50 + j * 3,
-                    ImageUrl = $"https://example.com/images/{standName.Replace(" ", "").ToLower()}{j}.jpg"
+                    Price = 50 + j * 3
                 });
             }
 
-            stand.Catalogs.Add(standCatalog);
+            for (int j = 1; j <= 10; j++)
+            {
+                stand.Catalogs.Add(new Catalog
+                {
+                    Stand = stand,
+                    Product = new Product
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = $"Producto {j} - {standName}",
+                        Description = $"Delicioso {standName} número {j}",
+                        Category = category_2,
+                        ImageUrl = $"https://example.com/images/{standName.Replace(" ", "").ToLower()}_{j}.jpg"
+                    },
+                    InStock = true,
+                    Price = 30 + j * 3
+                });
+            }
 
             eventEntity.Stands.Add(stand);
-            eventEntity.Catalog = standCatalog;
-
-            standCatalog.Event = eventEntity;
-            standCatalog.EventId = eventEntity.Id;
         }
 
         _context.Events.Add(eventEntity);

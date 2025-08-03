@@ -16,7 +16,7 @@ public class EventController : ControllerBase
         _eventDataService = eventDataService;
     }
 
-    [Authorize]
+    //[Authorize]
     [HttpGet("{eventId:guid}/products")]
     [ProducesResponseType<ProductResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

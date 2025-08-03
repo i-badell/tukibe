@@ -30,10 +30,13 @@ public class Worker : BackgroundService
             Guid eventId;
             Guid.TryParse(_configuration["SeedEventId"], out eventId);
             await seedService.SeedSampleEventAsync(eventId);
+
+            _logger.LogError("Migrations y seeding success");
         }
         catch (Exception e)
         {
             _logger.LogError("An error ocurred during migration", e);
         }
+        Environment.Exit(0);
     }
 }

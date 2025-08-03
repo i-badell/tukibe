@@ -5,41 +5,41 @@ namespace Api.Context;
 
 public class ClientContext : DbContext
 {
-    public DbSet<Catalog> Catalogs { get; set; }
     public DbSet<Event> Events { get; set; }
+    public DbSet<Category> Categories { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Stand> Stands { get; set; }
-
+    public DbSet<Catalog> Catalogs { get; set; }
     public ClientContext(DbContextOptions<ClientContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Stand>()
-            .HasMany(s => s.Catalogs)
-            .WithOne(c => c.Stand)
-            .HasForeignKey(c => c.StandId)
-            .IsRequired(false);
-
-        modelBuilder.Entity<Catalog>()
-          .HasOne(e => e.Event)
-          .WithOne(c => c.Catalog)
-          .HasForeignKey<Catalog>(x => x.EventId)
-          .IsRequired(false);
-
-        modelBuilder.Entity<Product>()
-          .Property(m => m.Price)
-          .HasPrecision(18, 2);
-
-        modelBuilder.Entity<Product>()
-               .HasMany(p => p.Catalogs)
-               .WithMany(c => c.Products)
-               .UsingEntity(join => join.ToTable("ProductCatalogs"));
-
         modelBuilder.Entity<Event>()
             .HasMany(e => e.Stands)
-            .WithMany(s => s.Events)
-            .UsingEntity(join => join.ToTable("EventStands"));
+            .WithOne(s => s.Event);
 
+        modelBuilder.Entity<Product>()
+            .HasOne(p => p.Category)
+            .WithMany(c => c.Products)
+            .HasForeignKey(p => p.CategoryId);
+
+        modelBuilder.Entity<Catalog>()
+            .HasKey(c => new { c.StandId, c.ProductId });
+
+        modelBuilder.Entity<Catalog>()
+          .Property(c => c.Price)
+          .HasPrecision(18, 2);
+
+        modelBuilder.Entity<Catalog>()
+            .HasOne(c => c.Stand)
+            .WithMany(s => s.Catalogs)
+            .HasForeignKey(c => c.StandId);
+
+        modelBuilder.Entity<Catalog>()
+            .HasOne(c => c.Product)
+            .WithMany(p => p.Catalogs)
+            .HasForeignKey(c => c.ProductId);
+       
         base.OnModelCreating(modelBuilder);
     }
 }

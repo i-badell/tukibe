@@ -22,17 +22,19 @@ public class EventService : IEventService
             .Select(e => new ProductResponse
             {
                 EventId = e.Id,
-                Catalog = e.Catalog == null ? new() : e.Catalog.Products.ToDto(),
                 Stands = e.Stands
                     .Select(s => new StandDto
                     {
                         StandId = s.Id,
                         Name = s.Name,
-                        Catalogs = s.Catalogs
-                            .Select(c => new CatalogDto
+                        Products = s.Catalogs
+                            .Select(c => new ProductDto
                             {
-                                CatalogId = c.Id,
-                                Products = c.Products.ToDto()
+                                ProductId = c.Product.Id,  
+                                Name = c.Product.Name,
+                                Description = c.Product.Description,
+                                ImageUrl = c.Product.ImageUrl,
+                                Price = c.Price
                             })
                             .ToList()
                     })
@@ -44,18 +46,31 @@ public class EventService : IEventService
 
 public static class Mappers
 {
-    public static List<ProductDto> ToDto(this IEnumerable<Product> products) =>
-      products
-        .Where(p => p.InStock)
-        .Select(p => p.ToDto())
-        .ToList();
+    //public static List<ProductDto> ToDto(this IEnumerable<Product> products) =>
+    //  products
+    //    .Where(p => p.InStock)
+    //    .Select(p => p.ToDto())
+    //    .ToList();
 
-    public static ProductDto ToDto(this Product product) => new ProductDto
+
+    //public static ProductDto ToDto(this Product product) => new ProductDto
+    //{
+    //    ProductId = product.Id,
+    //    Name = product.Name,
+    //    Description = product.Description,
+    //    Price = product.Price,
+    //    ImageUrl = product.ImageUrl
+    //};
+
+
+    public static List<CategoryDto> ToDto(this IEnumerable<Category> Categories) =>
+     Categories
+       .Select(c => c.ToDto())
+       .ToList();
+
+    public static CategoryDto ToDto(this Category category) => new CategoryDto
     {
-        ProductId = product.Id,
-        Name = product.Name,
-        Description = product.Description,
-        Price = product.Price,
-        ImageUrl = product.ImageUrl
+        Id = category.Id,
+        Name = category.Name,
     };
 }

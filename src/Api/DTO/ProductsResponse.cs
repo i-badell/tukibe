@@ -1,3 +1,5 @@
+using Api.Models;
+
 namespace Api.Dto;
 
 public class ProductResponse
