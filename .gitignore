@@ -2,6 +2,7 @@
 ## Build results
 bin/
 obj/
+**/obj/**
 [Bb]uild/
 [Ll]ogs/
 
