@@ -2,6 +2,7 @@ using Api.Context;
 using Api.Dto;
 using Api.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Metadata;
 
 namespace Api.Services;
 
@@ -13,34 +14,79 @@ public class EventService : IEventService
     {
         _context = context;
     }
-
-    public async Task<ProductResponse?> GetEventProducts(Guid eventId)
+    public async Task<StandResponse?> GetStandData(Guid eventId, Guid standId)
     {
-        // TODO: Add mappers for dtos
-        return await _context.Events
+        Event? e = await _context.Events
             .Where(e => e.Id == eventId)
-            .Select(e => new ProductResponse
+            .FirstOrDefaultAsync();
+
+        if (e == null) {
+            return null;
+        }
+
+        return await _context.Stands            
+            .Where(s => s.Id == standId)
+            .Select(s => new StandResponse
             {
-                EventId = e.Id,
-                Stands = e.Stands
-                    .Select(s => new StandDto
+                EventId = eventId,
+                StandId = standId,
+                StandName = s.Name,
+                Products = s.Catalogs                    
+                    .Select(c => new ProductDto
                     {
-                        StandId = s.Id,
-                        Name = s.Name,
-                        Products = s.Catalogs
-                            .Select(c => new ProductDto
-                            {
-                                ProductId = c.Product.Id,  
-                                Name = c.Product.Name,
-                                Description = c.Product.Description,
-                                ImageUrl = c.Product.ImageUrl,
-                                Price = c.Price
-                            })
-                            .ToList()
+                        ProductId = c.Product.Id,
+                        Name = c.Product.Name,
+                        Description = c.Product.Description,
+                        ImageUrl = c.Product.ImageUrl,
+                        Price = c.Price
                     })
                     .ToList()
             })
             .FirstOrDefaultAsync();
+    }
+    public async Task<EventStandsResponse?> GetEventStands(Guid eventId)
+    {
+        Event? e = await _context.Events
+            .Where(e => e.Id == eventId)
+            .Include(e => e.Stands)
+            .ThenInclude(s => s.Catalogs)
+            .ThenInclude(c => c.Product)
+            .FirstOrDefaultAsync();
+
+        if (e == null)
+        {
+            return null;
+        }
+
+        var stands = e.Stands
+            .Select(s => new StandDto
+            {
+                StandId = s.Id,
+                Name = s.Name,
+                Products = s.Catalogs
+                    .OrderByDescending(c => c.Price)
+                    .Take(5)
+                    .Select(c => new ProductDto
+                    {
+                        ProductId = c.Product.Id,
+                        Name = c.Product.Name,
+                        Description = c.Product.Description,
+                        ImageUrl = c.Product.ImageUrl,
+                        Price = c.Price
+                    })
+                    .ToList()
+            }).ToList();
+
+        EventStandsResponse response = new EventStandsResponse
+        {
+            EventId = e.Id,
+            EventName = e.Name,
+            EventImageUrl = e.ImageUrl,
+            Stand = stands.Count == 1 ? stands.First() : null,
+            Stands = stands.Count > 1 ? stands : []
+        };
+
+        return response;
     }
 }
 

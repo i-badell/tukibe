@@ -2,6 +2,7 @@ using Api.Dto;
 using Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Api.Controllers;
 
@@ -16,13 +17,25 @@ public class EventController : ControllerBase
         _eventDataService = eventDataService;
     }
 
-    //[Authorize]
-    [HttpGet("{eventId:guid}/products")]
-    [ProducesResponseType<ProductResponse>(StatusCodes.Status200OK)]
+    [HttpGet("{eventId:guid}/stands/{standId:guid}")]
+    [ProducesResponseType<StandResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetFullEventData(Guid eventId)
+    public async Task<IActionResult> GetFullStandData(Guid eventId, Guid standId)
     {
-        var data = await _eventDataService.GetEventProducts(eventId);
+        var data = await _eventDataService.GetStandData(eventId, standId);
+        if (data == null)
+        {
+            return NotFound();
+        }
+        return Ok(data);
+    }
+
+    [HttpGet("{eventId:guid}/stands")]
+    [ProducesResponseType<EventStandsResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetEventStands(Guid eventId)
+    {
+        var data = await _eventDataService.GetEventStands(eventId);
         if (data == null)
         {
             return NotFound();

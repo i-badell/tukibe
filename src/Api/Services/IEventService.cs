@@ -4,5 +4,6 @@ namespace Api.Services;
 
 public interface IEventService
 {
-    public Task<ProductResponse?> GetEventProducts(Guid eventId);
+    public Task<StandResponse?> GetStandData(Guid eventId, Guid standId);
+    public Task<EventStandsResponse?> GetEventStands(Guid eventId);
 }
