@@ -99,6 +99,32 @@ public class ProductSeed
         }
 
         _context.Events.Add(eventEntity);
+
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Auth0Id = "auth0|demo-user",
+            IsDeleted = false,            
+        };
+        _context.Users.Add(user);
+
+        for (int i = 1; i <= 10; i++)
+        {
+            var notification = new Notification
+            {
+                Id = Guid.NewGuid(),
+                Event = eventEntity,
+                User = user,
+                Title = $"Title Notification #{i}",
+                Message = $"Message Notification #{i}",
+                CreatedAt = DateTime.UtcNow,
+                IsRead = i < 7,
+                IsDeleted = i < 3
+            };
+
+            _context.Notifications.Add(notification);
+        }
+
         await _context.SaveChangesAsync();
     }
 }

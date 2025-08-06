@@ -10,6 +10,8 @@ public class ClientContext : DbContext
     public DbSet<Product> Products { get; set; }
     public DbSet<Stand> Stands { get; set; }
     public DbSet<Catalog> Catalogs { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
     public ClientContext(DbContextOptions<ClientContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -39,7 +41,17 @@ public class ClientContext : DbContext
             .HasOne(c => c.Product)
             .WithMany(p => p.Catalogs)
             .HasForeignKey(c => c.ProductId);
-       
+
+        modelBuilder.Entity<Notification>()
+            .HasOne(n => n.Event)
+            .WithMany()
+            .HasForeignKey(n => n.EventId);
+
+        modelBuilder.Entity<Notification>()
+            .HasOne(n => n.User)
+            .WithMany(u => u.Notifications)
+            .HasForeignKey(n => n.UserId);
+
         base.OnModelCreating(modelBuilder);
     }
 }
