@@ -45,27 +45,4 @@ public class EventController : ControllerBase
         }
         return Ok(data);
     }
-
-    [Authorize]
-    [HttpGet("{eventId:guid}/notifications/count")]
-    [ProducesResponseType<NotificationsCountResponse>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetUserNotificationsCount(Guid eventId)
-    {
-        var auth0Id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        //var auth0Id = "auth0|demo-user";
-        foreach (var claim in User.Claims)
-        {
-            _logger.LogInformation($"{claim.Type}: {claim.Value}");
-        }
-        _logger.LogInformation($"auth0id: {auth0Id}");
-
-        
-        var data = await _eventDataService.GetUserNotificationsCount(eventId, auth0Id);
-        if (data == null)
-        {
-            return NotFound();
-        }
-        return Ok(data);
-    }
 }

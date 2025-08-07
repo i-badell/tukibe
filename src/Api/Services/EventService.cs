@@ -89,26 +89,12 @@ public class EventService : IEventService
 
         return response;
     }
-    public async Task<NotificationsCountResponse?> GetUserNotificationsCount(Guid eventId, string auth0Id)
+
+    public async Task<Event?> GetEventById(Guid eventId)
     {
-        var e = await _context.Events
+        return await _context.Events
             .Where(e => e.Id == eventId)
             .FirstOrDefaultAsync();
-
-        if (e is null)
-        {
-            return null;
-        }
-
-        return await _context.Users
-            .Where(u => u.Auth0Id == auth0Id)
-            .Select(u => new NotificationsCountResponse
-            {
-                UnreadCount = u.Notifications
-                .Where(n => n.EventId == eventId)
-                .Count(n => !n.IsRead && !n.IsDeleted)
-            })
-            .FirstOrDefaultAsync();          
     }
 }
 
