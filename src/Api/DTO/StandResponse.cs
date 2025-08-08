@@ -7,5 +7,6 @@ public class StandResponse
     public Guid EventId { get; set; }
     public Guid StandId { get; set; }
     public string? StandName { get; set; }
+    public string? StandImageUrl { get; set; }
     public List<ProductDto> Products { get; set; } = new();
 }

@@ -16,11 +16,11 @@ public class EventService : IEventService
     }
     public async Task<StandResponse?> GetStandData(Guid eventId, Guid standId)
     {
-        Event? e = await _context.Events
+        var e = await _context.Events
             .Where(e => e.Id == eventId)
             .FirstOrDefaultAsync();
 
-        if (e == null) {
+        if (e is null) {
             return null;
         }
 
@@ -31,6 +31,7 @@ public class EventService : IEventService
                 EventId = eventId,
                 StandId = standId,
                 StandName = s.Name,
+                StandImageUrl = s.ImageUrl,
                 Products = s.Catalogs                    
                     .Select(c => new ProductDto
                     {
@@ -46,14 +47,14 @@ public class EventService : IEventService
     }
     public async Task<EventStandsResponse?> GetEventStands(Guid eventId)
     {
-        Event? e = await _context.Events
+        var e = await _context.Events
             .Where(e => e.Id == eventId)
             .Include(e => e.Stands)
             .ThenInclude(s => s.Catalogs)
             .ThenInclude(c => c.Product)
             .FirstOrDefaultAsync();
 
-        if (e == null)
+        if (e is null)
         {
             return null;
         }
@@ -63,6 +64,7 @@ public class EventService : IEventService
             {
                 StandId = s.Id,
                 Name = s.Name,
+                StandImageUrl = s.ImageUrl,
                 Products = s.Catalogs
                     .OrderByDescending(c => c.Price)
                     .Take(5)
