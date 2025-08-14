@@ -1,4 +1,5 @@
 using Api.Context;
+using Api.Services.Interfaces;
 using Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Scalar.AspNetCore;
@@ -8,6 +9,8 @@ var config = builder.Configuration;
 
 // DI
 builder.Services.AddScoped<IEventService, EventService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // SQL Server
 builder.AddSqlServerDbContext<ClientContext>("tuki-db");

@@ -1,6 +1,7 @@
 using Api.Context;
 using Api.Dto;
 using Api.Models;
+using Api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Metadata;
 
@@ -89,6 +90,13 @@ public class EventService : IEventService
         };
 
         return response;
+    }
+
+    public async Task<Event?> GetEventById(Guid eventId)
+    {
+        return await _context.Events
+            .Where(e => e.Id == eventId)
+            .FirstOrDefaultAsync();
     }
 }
 
