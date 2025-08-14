@@ -35,7 +35,7 @@ public class Worker : BackgroundService
         }
         catch (Exception e)
         {
-            _logger.LogError("An error ocurred during migration", e);
+            _logger.LogError($"An error ocurred during migration {e}");
         }
         Environment.Exit(0);
     }

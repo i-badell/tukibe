@@ -1,5 +1,6 @@
 using Api.Context;
 using Api.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace DbMigration.Services;
 
@@ -14,11 +15,13 @@ public class ProductSeed
 
     public async Task SeedSampleEventAsync(Guid eventId)
     {
-        var dbEvent = _context.Events.FirstOrDefault(x => x.Id == eventId);
-        if (dbEvent is not null)
-        {
-            return;
-        }
+        await _context.Products.ExecuteDeleteAsync();
+        await _context.Categories.ExecuteDeleteAsync();
+        await _context.Catalogs.ExecuteDeleteAsync();
+        await _context.Stands.ExecuteDeleteAsync();
+        await _context.Notifications.ExecuteDeleteAsync();
+        await _context.Users.ExecuteDeleteAsync();
+        await _context.Events.ExecuteDeleteAsync();
 
         var eventEntity = new Event
         {
@@ -99,6 +102,32 @@ public class ProductSeed
         }
 
         _context.Events.Add(eventEntity);
+
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Auth0Id = "auth0|demo-user",
+            IsDeleted = false,            
+        };
+        _context.Users.Add(user);
+
+        for (int i = 1; i <= 10; i++)
+        {
+            var notification = new Notification
+            {
+                Id = Guid.NewGuid(),
+                Event = eventEntity,
+                User = user,
+                Title = $"Title Notification #{i}",
+                Message = $"Message Notification #{i}",
+                CreatedAt = DateTime.UtcNow,
+                IsRead = i < 7,
+                IsDeleted = i < 3
+            };
+
+            _context.Notifications.Add(notification);
+        }
+
         await _context.SaveChangesAsync();
     }
 }

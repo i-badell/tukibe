@@ -1,8 +1,9 @@
 using Api.Dto;
-using Api.Services;
+using Api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 
 namespace Api.Controllers;
 
@@ -11,10 +12,12 @@ namespace Api.Controllers;
 public class EventController : ControllerBase
 {
     private readonly IEventService _eventDataService;
+    private readonly ILogger<EventController> _logger;
 
-    public EventController(IEventService eventDataService)
+    public EventController(IEventService eventDataService, ILogger<EventController> logger)
     {
         _eventDataService = eventDataService;
+        _logger = logger;
     }
 
     [HttpGet("{eventId:guid}/stands/{standId:guid}")]
@@ -25,7 +28,7 @@ public class EventController : ControllerBase
         var data = await _eventDataService.GetStandData(eventId, standId);
         if (data == null)
         {
-            return NotFound();
+            return NotFound(new { ErrorMsg = "No se encontró el evento o el stand" });
         }
         return Ok(data);
     }
@@ -38,7 +41,7 @@ public class EventController : ControllerBase
         var data = await _eventDataService.GetEventStands(eventId);
         if (data == null)
         {
-            return NotFound();
+            return NotFound(new { ErrorMsg = "No se encontró el evento" });
         }
         return Ok(data);
     }
