@@ -1,5 +1,6 @@
 using Api.Context;
 using Api.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace DbMigration.Services;
 
@@ -14,11 +15,13 @@ public class ProductSeed
 
     public async Task SeedSampleEventAsync(Guid eventId)
     {
-        var dbEvent = _context.Events.FirstOrDefault(x => x.Id == eventId);
-        if (dbEvent is not null)
-        {
-            return;
-        }
+        await _context.Products.ExecuteDeleteAsync();
+        await _context.Categories.ExecuteDeleteAsync();
+        await _context.Catalogs.ExecuteDeleteAsync();
+        await _context.Stands.ExecuteDeleteAsync();
+        await _context.Notifications.ExecuteDeleteAsync();
+        await _context.Users.ExecuteDeleteAsync();
+        await _context.Events.ExecuteDeleteAsync();
 
         var eventEntity = new Event
         {

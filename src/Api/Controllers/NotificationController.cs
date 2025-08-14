@@ -35,13 +35,13 @@ public class NotificationController : ControllerBase
     {
         var e = await _eventDataService.GetEventById(eventId);
         if (e is null)
-            return NotFound();
+            return NotFound(new { ErrorMsg = "No se encontró el evento" });
 
         var auth0Id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         var user = await _userService.GetUserByAuth0Id(auth0Id);
         if (user is null)
-            return NotFound();
+            return NotFound(new { ErrorMsg = "No se encontró el usuario" });
 
         var count = await _notificationDataService.GetUnreadNotificationsCount(e.Id, user.Id);
         
