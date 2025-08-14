@@ -32,6 +32,7 @@ public class EventService : IEventService
                 EventId = eventId,
                 StandId = standId,
                 StandName = s.Name,
+                StandImageUrl = s.ImageUrl,
                 Products = s.Catalogs                    
                     .Select(c => new ProductDto
                     {
@@ -64,6 +65,7 @@ public class EventService : IEventService
             {
                 StandId = s.Id,
                 Name = s.Name,
+                StandImageUrl = s.ImageUrl,
                 Products = s.Catalogs
                     .OrderByDescending(c => c.Price)
                     .Take(5)

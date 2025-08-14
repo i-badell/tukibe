@@ -27,7 +27,7 @@ public class ProductSeed
         {
             Id = eventId,
             Name = $"Event {eventId}",
-            ImageUrl = $"https://example.com/images/event_{eventId}.jpg"
+            ImageUrl = $"https://placehold.co/200"
         };
 
         var category_1 = new Category
@@ -58,7 +58,7 @@ public class ProductSeed
             { 
                 Id = Guid.NewGuid(),
                 Name = standName,
-                ImageUrl = $"https://example.com/images/{standName.Replace(" ", "").ToLower()}.jpg",
+                ImageUrl = $"https://placehold.co/200",
                 Event = eventEntity,                
             };
 
@@ -73,7 +73,7 @@ public class ProductSeed
                         Name = $"Producto {j} - {standName}",
                         Description = $"Delicioso {standName} número {j}",
                         Category = category_1,
-                        ImageUrl = $"https://example.com/images/{standName.Replace(" ", "").ToLower()}_{j}.jpg"
+                        ImageUrl = $"https://placehold.co/200"
                     },
                     InStock = true,
                     Price = 50 + j * 3
@@ -91,7 +91,7 @@ public class ProductSeed
                         Name = $"Producto {j} - {standName}",
                         Description = $"Delicioso {standName} número {j}",
                         Category = category_2,
-                        ImageUrl = $"https://example.com/images/{standName.Replace(" ", "").ToLower()}_{j}.jpg"
+                        ImageUrl = $"https://placehold.co/200"
                     },
                     InStock = true,
                     Price = 30 + j * 3
