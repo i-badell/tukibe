@@ -47,4 +47,25 @@ public class NotificationController : ControllerBase
         
         return Ok(new NotificationsCountResponse { UnreadCount = count });
     }
+
+    [Authorize]
+    [HttpGet("{eventId:guid}/notifications")]
+    [ProducesResponseType<List<NotificationDto>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetNotifications(Guid eventId)
+    {
+        var e = await _eventDataService.GetEventById(eventId);
+        if (e is null)
+            return NotFound(new { ErrorMsg = "No se encontró el evento" });
+
+        var auth0Id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        var user = await _userService.GetUserByAuth0Id(auth0Id);
+        if (user is null)
+            return NotFound(new { ErrorMsg = "No se encontró el usuario" });
+
+        var data = await _notificationDataService.GetNotifications(e.Id, user.Id);
+
+        return Ok(data);
+    }
 }
