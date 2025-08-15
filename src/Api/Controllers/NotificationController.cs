@@ -1,6 +1,7 @@
 using Api.Dto;
 using Api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
@@ -67,5 +68,63 @@ public class NotificationController : ControllerBase
         var data = await _notificationDataService.GetNotifications(e.Id, user.Id);
 
         return Ok(data);
+    }
+
+    [Authorize]
+    [HttpDelete("{eventId:guid}/notifications")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteAllNotifications(Guid eventId)
+    {
+        var e = await _eventDataService.GetEventById(eventId);
+        if (e is null)
+            return NotFound(new { ErrorMsg = "No se encontró el evento" });
+
+        var auth0Id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        var user = await _userService.GetUserByAuth0Id(auth0Id);
+        if (user is null)
+            return NotFound(new { ErrorMsg = "No se encontró el usuario" });
+
+        try
+        {
+            await _notificationDataService.DeleteAllNotifications(e.Id, user.Id);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            return StatusCode(500, new { ErrorMsg = "Ocurrió un error al actualizar los registros"});
+        }
+    }
+
+    [Authorize]
+    [HttpDelete("{eventId:guid}/notifications/{notificationId:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteNotificationById(Guid eventId, Guid notificationId)
+    {
+        var e = await _eventDataService.GetEventById(eventId);
+        if (e is null)
+            return NotFound(new { ErrorMsg = "No se encontró el evento" });
+
+        var auth0Id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        var user = await _userService.GetUserByAuth0Id(auth0Id);
+        if (user is null)
+            return NotFound(new { ErrorMsg = "No se encontró el usuario" });
+
+        try
+        {
+            await _notificationDataService.DeleteNotificationById(notificationId, eventId, user.Id);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            return StatusCode(500, new { ErrorMsg = "Ocurrió un error al actualizar los registros" });
+        }
     }
 }

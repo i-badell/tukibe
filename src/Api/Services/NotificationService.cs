@@ -42,4 +42,24 @@ public class NotificationService : INotificationService
             .ToListAsync();
             
     }
+    public async Task DeleteAllNotifications(Guid eventId, Guid userId)
+    {
+        await _context.Notifications
+            .Where(n => n.EventId == eventId)
+            .Where(n => n.UserId == userId)
+            .Where(n => !n.IsDeleted)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(n => n.IsDeleted, true));
+    }
+
+    public async Task DeleteNotificationById(Guid notificationId, Guid eventId, Guid userId)
+    {
+        await _context.Notifications
+            .Where (n => n.Id == notificationId)
+            .Where(n => n.EventId == eventId)
+            .Where(n => n.UserId == userId)
+            .Where(n => !n.IsDeleted)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(n => n.IsDeleted, true));
+    }
 }
