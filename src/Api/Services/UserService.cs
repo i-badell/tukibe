@@ -14,9 +14,9 @@ public class UserService : IUserService
         _context = context;
     }
     
-    public async Task<User?> GetUserByAuth0Id(string auth0Id)
+    public async Task<User?> GetUserByAuth0Id(string? auth0Id)
     {
-        return await _context.Users
+        return auth0Id is null ? null : await _context.Users
             .Where(u => u.Auth0Id == auth0Id)            
             .FirstOrDefaultAsync();          
     }

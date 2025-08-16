@@ -127,4 +127,119 @@ public class NotificationController : ControllerBase
             return StatusCode(500, new { ErrorMsg = "Ocurrió un error al actualizar los registros" });
         }
     }
+
+    [Authorize]
+    [HttpPut("{eventId:guid}/notifications/read")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ReadAllNotifications(Guid eventId)
+    {
+        var e = await _eventDataService.GetEventById(eventId);
+        if (e is null)
+            return NotFound(new { ErrorMsg = "No se encontró el evento" });
+
+        var auth0Id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var user = await _userService.GetUserByAuth0Id(auth0Id);
+        if (user is null)
+            return NotFound(new { ErrorMsg = "No se encontró el usuario" });
+
+        try
+        {
+            await _notificationDataService.ReadAllNotifications(e.Id, user.Id);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            return StatusCode(500, new { ErrorMsg = "Ocurrió un error al actualizar los registros" });
+        }
+    }
+
+    [Authorize]
+    [HttpPut("{eventId:guid}/notifications/read/{notificationId:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ReadNotificationById(Guid eventId, Guid notificationId)
+    {
+        var e = await _eventDataService.GetEventById(eventId);
+        if (e is null)
+            return NotFound(new { ErrorMsg = "No se encontró el evento" });
+
+        var auth0Id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var user = await _userService.GetUserByAuth0Id(auth0Id);
+        if (user is null)
+            return NotFound(new { ErrorMsg = "No se encontró el usuario" });
+
+        try
+        {
+            await _notificationDataService.ReadNotificationById(notificationId, eventId, user.Id);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            return StatusCode(500, new { ErrorMsg = "Ocurrió un error al actualizar los registros" });
+        }
+    }
+    [Authorize]
+    [HttpPut("{eventId:guid}/notifications/unread")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UnreadAllNotifications(Guid eventId)
+    {
+        var e = await _eventDataService.GetEventById(eventId);
+        if (e is null)
+            return NotFound(new { ErrorMsg = "No se encontró el evento" });
+
+        var auth0Id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var user = await _userService.GetUserByAuth0Id(auth0Id);
+        if (user is null)
+            return NotFound(new { ErrorMsg = "No se encontró el usuario" });
+
+        try
+        {
+            await _notificationDataService.UnreadAllNotifications(e.Id, user.Id);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            return StatusCode(500, new { ErrorMsg = "Ocurrió un error al actualizar los registros" });
+        }
+    }
+
+    [Authorize]
+    [HttpPut("{eventId:guid}/notifications/unread/{notificationId:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> UnreadNotificationById(Guid eventId, Guid notificationId)
+    {
+        var e = await _eventDataService.GetEventById(eventId);
+        if (e is null)
+            return NotFound(new { ErrorMsg = "No se encontró el evento" });
+
+        var auth0Id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var user = await _userService.GetUserByAuth0Id(auth0Id);
+        if (user is null)
+            return NotFound(new { ErrorMsg = "No se encontró el usuario" });
+
+        try
+        {
+            await _notificationDataService.UnreadNotificationById(notificationId, eventId, user.Id);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            return StatusCode(500, new { ErrorMsg = "Ocurrió un error al actualizar los registros" });
+        }
+    }
 }

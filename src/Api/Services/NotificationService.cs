@@ -62,4 +62,45 @@ public class NotificationService : INotificationService
             .ExecuteUpdateAsync(setter => setter
                 .SetProperty(n => n.IsDeleted, true));
     }
+
+    public async Task ReadAllNotifications(Guid eventId, Guid userId)
+    {
+        await _context.Notifications
+            .Where(n => n.EventId == eventId)
+            .Where(n => n.UserId == userId)
+            .Where(n => !n.IsDeleted)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(n => n.IsRead, true));
+    }
+
+    public async Task ReadNotificationById(Guid notificationId, Guid eventId, Guid userId)
+    {
+        await _context.Notifications
+            .Where(n => n.Id == notificationId)
+            .Where(n => n.EventId == eventId)
+            .Where(n => n.UserId == userId)
+            .Where(n => !n.IsDeleted)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(n => n.IsRead, true));
+    }
+    public async Task UnreadAllNotifications(Guid eventId, Guid userId)
+    {
+        await _context.Notifications
+            .Where(n => n.EventId == eventId)
+            .Where(n => n.UserId == userId)
+            .Where(n => !n.IsDeleted)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(n => n.IsRead, false));
+    }
+
+    public async Task UnreadNotificationById(Guid notificationId, Guid eventId, Guid userId)
+    {
+        await _context.Notifications
+            .Where(n => n.Id == notificationId)
+            .Where(n => n.EventId == eventId)
+            .Where(n => n.UserId == userId)
+            .Where(n => !n.IsDeleted)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(n => n.IsRead, false));
+    }
 }
