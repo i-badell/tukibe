@@ -45,4 +45,17 @@ public class EventController : ControllerBase
         }
         return Ok(data);
     }
+
+    [HttpGet("{eventId:guid}/stands/summary")]
+    [ProducesResponseType<EventStandsResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetEventStandsSummary(Guid eventId)
+    {
+        var data = await _eventDataService.GetEventStandsSummary(eventId);
+        if (data == null)
+        {
+            return NotFound(new { ErrorMsg = "No se encontró el evento" });
+        }
+        return Ok(data);
+    }
 }

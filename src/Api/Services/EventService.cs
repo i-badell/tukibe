@@ -91,7 +91,37 @@ public class EventService : IEventService
 
         return response;
     }
+    public async Task<EventStandsResponse?> GetEventStandsSummary(Guid eventId)
+    {
+        var e = await _context.Events
+            .Where(e => e.Id == eventId)
+            .Include(e => e.Stands)
+            .FirstOrDefaultAsync();
 
+        if (e is null)
+        {
+            return null;
+        }
+
+        var stands = e.Stands
+            .Select(s => new StandDto
+            {
+                StandId = s.Id,
+                Name = s.Name,
+                StandImageUrl = s.ImageUrl
+            }).ToList();
+
+        EventStandsResponse response = new EventStandsResponse
+        {
+            EventId = e.Id,
+            EventName = e.Name,
+            EventImageUrl = e.ImageUrl,
+            Stand = stands.Count == 1 ? stands.First() : null,
+            Stands = stands.Count > 1 ? stands : []
+        };
+
+        return response;
+    }
     public async Task<Event?> GetEventById(Guid eventId)
     {
         return await _context.Events
