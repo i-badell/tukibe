@@ -87,16 +87,8 @@ public class NotificationController : ControllerBase
         if (user is null)
             return NotFound(new { ErrorMsg = "No se encontró el usuario" });
 
-        try
-        {
-            await _notificationDataService.DeleteAllNotifications(e.Id, user.Id);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.ToString());
-            return StatusCode(500, new { ErrorMsg = "Ocurrió un error al actualizar los registros"});
-        }
+        await _notificationDataService.DeleteAllNotifications(e.Id, user.Id);
+        return Ok();        
     }
 
     [Authorize]
@@ -116,16 +108,8 @@ public class NotificationController : ControllerBase
         if (user is null)
             return NotFound(new { ErrorMsg = "No se encontró el usuario" });
 
-        try
-        {
-            await _notificationDataService.DeleteNotificationById(notificationId, eventId, user.Id);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.ToString());
-            return StatusCode(500, new { ErrorMsg = "Ocurrió un error al actualizar los registros" });
-        }
+        await _notificationDataService.DeleteNotificationById(notificationId, eventId, user.Id);
+        return Ok();
     }
 
     [Authorize]
@@ -145,16 +129,8 @@ public class NotificationController : ControllerBase
         if (user is null)
             return NotFound(new { ErrorMsg = "No se encontró el usuario" });
 
-        try
-        {
-            await _notificationDataService.ReadAllNotifications(e.Id, user.Id);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.ToString());
-            return StatusCode(500, new { ErrorMsg = "Ocurrió un error al actualizar los registros" });
-        }
+        await _notificationDataService.ReadAllNotifications(e.Id, user.Id);
+        return Ok();
     }
 
     [Authorize]
@@ -174,17 +150,10 @@ public class NotificationController : ControllerBase
         if (user is null)
             return NotFound(new { ErrorMsg = "No se encontró el usuario" });
 
-        try
-        {
-            await _notificationDataService.ReadNotificationById(notificationId, eventId, user.Id);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.ToString());
-            return StatusCode(500, new { ErrorMsg = "Ocurrió un error al actualizar los registros" });
-        }
+        await _notificationDataService.ReadNotificationById(notificationId, eventId, user.Id);
+        return Ok();
     }
+
     [Authorize]
     [HttpPut("{eventId:guid}/notifications/unread")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -202,16 +171,8 @@ public class NotificationController : ControllerBase
         if (user is null)
             return NotFound(new { ErrorMsg = "No se encontró el usuario" });
 
-        try
-        {
-            await _notificationDataService.UnreadAllNotifications(e.Id, user.Id);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.ToString());
-            return StatusCode(500, new { ErrorMsg = "Ocurrió un error al actualizar los registros" });
-        }
+        await _notificationDataService.UnreadAllNotifications(e.Id, user.Id);
+        return Ok();
     }
 
     [Authorize]
@@ -231,15 +192,7 @@ public class NotificationController : ControllerBase
         if (user is null)
             return NotFound(new { ErrorMsg = "No se encontró el usuario" });
 
-        try
-        {
-            await _notificationDataService.UnreadNotificationById(notificationId, eventId, user.Id);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.ToString());
-            return StatusCode(500, new { ErrorMsg = "Ocurrió un error al actualizar los registros" });
-        }
+        await _notificationDataService.UnreadNotificationById(notificationId, eventId, user.Id);
+        return Ok();
     }
 }

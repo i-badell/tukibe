@@ -1,6 +1,7 @@
 using Api.Context;
-using Api.Services.Interfaces;
+using Api.Middlewares;
 using Api.Services;
+using Api.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Scalar.AspNetCore;
 
@@ -54,6 +55,8 @@ if (app.Environment.IsDevelopment())
         };
     });
 }
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.MapControllers();
 
