@@ -24,4 +24,83 @@ public class NotificationService : INotificationService
             .Where(n => !n.IsRead && !n.IsDeleted)
             .CountAsync();
     }
+    public async Task<List<NotificationDto>> GetNotifications(Guid eventId, Guid userId)
+    {
+        return await _context.Notifications
+            .Where(n => n.EventId == eventId)
+            .Where(n => n.UserId == userId)
+            .Where(n => !n.IsDeleted)
+            .OrderByDescending(n => n.CreatedAt)
+            .Select(n => new NotificationDto
+            {
+                NotificationId = n.Id,
+                NotificationTitle = n.Title,
+                NotificationMessage = n.Message,
+                CreatedAt = n.CreatedAt,
+                IsRead = n.IsRead,
+            })
+            .ToListAsync();
+            
+    }
+    public async Task DeleteAllNotifications(Guid eventId, Guid userId)
+    {
+        await _context.Notifications
+            .Where(n => n.EventId == eventId)
+            .Where(n => n.UserId == userId)
+            .Where(n => !n.IsDeleted)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(n => n.IsDeleted, true));
+    }
+
+    public async Task DeleteNotificationById(Guid notificationId, Guid eventId, Guid userId)
+    {
+        await _context.Notifications
+            .Where (n => n.Id == notificationId)
+            .Where(n => n.EventId == eventId)
+            .Where(n => n.UserId == userId)
+            .Where(n => !n.IsDeleted)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(n => n.IsDeleted, true));
+    }
+
+    public async Task ReadAllNotifications(Guid eventId, Guid userId)
+    {
+        await _context.Notifications
+            .Where(n => n.EventId == eventId)
+            .Where(n => n.UserId == userId)
+            .Where(n => !n.IsDeleted)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(n => n.IsRead, true));
+    }
+
+    public async Task ReadNotificationById(Guid notificationId, Guid eventId, Guid userId)
+    {
+        await _context.Notifications
+            .Where(n => n.Id == notificationId)
+            .Where(n => n.EventId == eventId)
+            .Where(n => n.UserId == userId)
+            .Where(n => !n.IsDeleted)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(n => n.IsRead, true));
+    }
+    public async Task UnreadAllNotifications(Guid eventId, Guid userId)
+    {
+        await _context.Notifications
+            .Where(n => n.EventId == eventId)
+            .Where(n => n.UserId == userId)
+            .Where(n => !n.IsDeleted)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(n => n.IsRead, false));
+    }
+
+    public async Task UnreadNotificationById(Guid notificationId, Guid eventId, Guid userId)
+    {
+        await _context.Notifications
+            .Where(n => n.Id == notificationId)
+            .Where(n => n.EventId == eventId)
+            .Where(n => n.UserId == userId)
+            .Where(n => !n.IsDeleted)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(n => n.IsRead, false));
+    }
 }
