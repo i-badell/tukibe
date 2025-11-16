@@ -6,9 +6,9 @@ namespace DbMigration.Services;
 
 public class ProductSeed
 {
-    private readonly ClientContext _context;
+    private readonly ApiContext _context;
 
-    public ProductSeed(ClientContext context)
+    public ProductSeed(ApiContext context)
     {
         _context = context;
     }
@@ -35,11 +35,11 @@ public class ProductSeed
             Id = Guid.NewGuid(),
             Name = "Comida"
         };
-        
+
         var category_2 = new Category
         {
             Id = Guid.NewGuid(),
-            Name = "Bebida"                      
+            Name = "Bebida"
         };
 
         _context.Categories.Add(category_1);
@@ -54,12 +54,12 @@ public class ProductSeed
 
         foreach (var standName in standNames)
         {
-            var stand = new Stand 
-            { 
+            var stand = new Stand
+            {
                 Id = Guid.NewGuid(),
                 Name = standName,
                 ImageUrl = $"https://placehold.co/200",
-                Event = eventEntity,                
+                Event = eventEntity,
             };
 
             for (int j = 1; j <= 10; j++)
@@ -107,7 +107,7 @@ public class ProductSeed
         {
             Id = Guid.NewGuid(),
             Auth0Id = "auth0|demo-user",
-            IsDeleted = false,            
+            IsDeleted = false,
         };
         _context.Users.Add(user);
 

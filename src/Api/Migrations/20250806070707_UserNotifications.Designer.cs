@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Api.Migrations
 {
-    [DbContext(typeof(ClientContext))]
+    [DbContext(typeof(ApiContext))]
     [Migration("20250806070707_UserNotifications")]
     partial class UserNotifications
     {

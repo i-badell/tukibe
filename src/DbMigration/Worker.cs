@@ -22,7 +22,7 @@ public class Worker : BackgroundService
         {
             await Task.Delay(TimeSpan.FromSeconds(5));
             using var scope = _serviceProvider.CreateScope();
-            var ctx = scope.ServiceProvider.GetRequiredService<ClientContext>();
+            var ctx = scope.ServiceProvider.GetRequiredService<ApiContext>();
             await ctx.Database.MigrateAsync(stoppingToken);
 
             await Task.Delay(TimeSpan.FromSeconds(5));

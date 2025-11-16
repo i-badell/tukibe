@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Api.Migrations
 {
-    [DbContext(typeof(ClientContext))]
+    [DbContext(typeof(ApiContext))]
     [Migration("20250814041326_NotificationMessageNotNullable")]
     partial class NotificationMessageNotNullable
     {

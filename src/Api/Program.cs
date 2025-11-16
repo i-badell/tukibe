@@ -14,8 +14,8 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 // SQL Server
-builder.AddSqlServerDbContext<ClientContext>("tuki-db");
-builder.EnrichSqlServerDbContext<ClientContext>();
+builder.AddSqlServerDbContext<ApiContext>("tuki-db");
+builder.EnrichSqlServerDbContext<ApiContext>();
 
 
 // AUthorization

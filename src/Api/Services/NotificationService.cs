@@ -9,13 +9,13 @@ namespace Api.Services;
 
 public class NotificationService : INotificationService
 {
-    private readonly ClientContext _context;
+    private readonly ApiContext _context;
 
-    public NotificationService(ClientContext context)
+    public NotificationService(ApiContext context)
     {
         _context = context;
     }
-    
+
     public async Task<int> GetUnreadNotificationsCount(Guid eventId, Guid userId)
     {
         return await _context.Notifications
@@ -40,7 +40,7 @@ public class NotificationService : INotificationService
                 IsRead = n.IsRead,
             })
             .ToListAsync();
-            
+
     }
     public async Task DeleteAllNotifications(Guid eventId, Guid userId)
     {
@@ -55,7 +55,7 @@ public class NotificationService : INotificationService
     public async Task DeleteNotificationById(Guid notificationId, Guid eventId, Guid userId)
     {
         await _context.Notifications
-            .Where (n => n.Id == notificationId)
+            .Where(n => n.Id == notificationId)
             .Where(n => n.EventId == eventId)
             .Where(n => n.UserId == userId)
             .Where(n => !n.IsDeleted)

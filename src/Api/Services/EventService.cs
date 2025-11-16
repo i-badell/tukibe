@@ -9,9 +9,9 @@ namespace Api.Services;
 
 public class EventService : IEventService
 {
-    private readonly ClientContext _context;
+    private readonly ApiContext _context;
 
-    public EventService(ClientContext context)
+    public EventService(ApiContext context)
     {
         _context = context;
     }
@@ -21,11 +21,12 @@ public class EventService : IEventService
             .Where(e => e.Id == eventId)
             .FirstOrDefaultAsync();
 
-        if (e is null) {
+        if (e is null)
+        {
             return null;
         }
 
-        return await _context.Stands            
+        return await _context.Stands
             .Where(s => s.Id == standId)
             .Select(s => new StandResponse
             {
@@ -33,7 +34,7 @@ public class EventService : IEventService
                 StandId = standId,
                 StandName = s.Name,
                 StandImageUrl = s.ImageUrl,
-                Products = s.Catalogs                    
+                Products = s.Catalogs
                     .Select(c => new ProductDto
                     {
                         ProductId = c.Product.Id,

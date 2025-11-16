@@ -7,6 +7,6 @@ var config = builder.Configuration;
 
 builder.Services.AddScoped<ProductSeed>();
 builder.Services.AddHostedService<Worker>();
-builder.AddSqlServerDbContext<ClientContext>("tuki-db");
+builder.AddSqlServerDbContext<ApiContext>("tuki-db");
 var host = builder.Build();
 host.Run();

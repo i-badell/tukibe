@@ -1,4 +1,4 @@
-namespace Api.Models.Cart;
+namespace Api.Models;
 
 public sealed class Cart
 {
