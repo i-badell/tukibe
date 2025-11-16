@@ -28,7 +28,7 @@ public class EventController : ControllerBase
         var data = await _eventDataService.GetStandData(eventId, standId);
         if (data == null)
         {
-            return NotFound(new { ErrorMsg = "No se encontró el evento o el stand" });
+            return NotFound(new { ErrorMsg = "No se encontrï¿½ el evento o el stand" });
         }
         return Ok(data);
     }
@@ -41,7 +41,7 @@ public class EventController : ControllerBase
         var data = await _eventDataService.GetEventStands(eventId);
         if (data == null)
         {
-            return NotFound(new { ErrorMsg = "No se encontró el evento" });
+            return NotFound(new { ErrorMsg = "No se encontrï¿½ el evento" });
         }
         return Ok(data);
     }
@@ -54,7 +54,7 @@ public class EventController : ControllerBase
         var data = await _eventDataService.GetEventStandsSummary(eventId);
         if (data == null)
         {
-            return NotFound(new { ErrorMsg = "No se encontró el evento" });
+            return NotFound(new { ErrorMsg = "No se encontrï¿½ el evento" });
         }
         return Ok(data);
     }

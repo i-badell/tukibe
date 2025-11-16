@@ -1,12 +1,13 @@
 namespace Api.Models;
 
-public class Product
+public sealed class Product
 {
     public Guid Id { get; set; }
     public required string Name { get; set; }
-    public required string Description { get; set; }
+    public string? Description { get; set; }
     public required string ImageUrl { get; set; }
-    public Guid CategoryId { get; set; }
-    public required Category Category { get; set; }
-    public ICollection<Catalog> Catalogs { get; set; } = new List<Catalog>();
+    public required decimal Price { get; set; }
+    public bool IsAvailable { get; set; }
+    public Stand Stand { get; set; } = null!;
+    public Guid StandId { get; set; }
 }
