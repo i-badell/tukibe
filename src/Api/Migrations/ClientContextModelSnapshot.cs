@@ -22,41 +22,59 @@ namespace Api.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Api.Models.Catalog", b =>
+            modelBuilder.Entity("Api.Models.Cart", b =>
                 {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("StandId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<bool>("InStock")
+                    b.Property<bool>("IsCompleted")
                         .HasColumnType("bit");
 
-                    b.Property<decimal>("Price")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
-                    b.HasKey("StandId", "ProductId");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasIndex("ProductId");
+                    b.HasKey("Id", "StandId");
 
-                    b.ToTable("Catalogs");
+                    b.HasIndex("StandId");
+
+                    b.ToTable("Carts");
                 });
 
-            modelBuilder.Entity("Api.Models.Category", b =>
+            modelBuilder.Entity("Api.Models.CartItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("CartId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CartStandId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("CartId", "CartStandId");
+
+                    b.ToTable("CartItems");
                 });
 
             modelBuilder.Entity("Api.Models.Event", b =>
@@ -122,24 +140,29 @@ namespace Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CategoryId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsAvailable")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("StandId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("StandId");
 
                     b.ToTable("Products");
                 });
@@ -154,7 +177,6 @@ namespace Api.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -186,23 +208,34 @@ namespace Api.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Api.Models.Catalog", b =>
+            modelBuilder.Entity("Api.Models.Cart", b =>
                 {
-                    b.HasOne("Api.Models.Product", "Product")
-                        .WithMany("Catalogs")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Api.Models.Stand", "Stand")
-                        .WithMany("Catalogs")
+                        .WithMany()
                         .HasForeignKey("StandId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Product");
-
                     b.Navigation("Stand");
+                });
+
+            modelBuilder.Entity("Api.Models.CartItem", b =>
+                {
+                    b.HasOne("Api.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Api.Models.Cart", "Cart")
+                        .WithMany("Items")
+                        .HasForeignKey("CartId", "CartStandId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cart");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Api.Models.Notification", b =>
@@ -226,13 +259,13 @@ namespace Api.Migrations
 
             modelBuilder.Entity("Api.Models.Product", b =>
                 {
-                    b.HasOne("Api.Models.Category", "Category")
+                    b.HasOne("Api.Models.Stand", "Stand")
                         .WithMany("Products")
-                        .HasForeignKey("CategoryId")
+                        .HasForeignKey("StandId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Category");
+                    b.Navigation("Stand");
                 });
 
             modelBuilder.Entity("Api.Models.Stand", b =>
@@ -246,9 +279,9 @@ namespace Api.Migrations
                     b.Navigation("Event");
                 });
 
-            modelBuilder.Entity("Api.Models.Category", b =>
+            modelBuilder.Entity("Api.Models.Cart", b =>
                 {
-                    b.Navigation("Products");
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("Api.Models.Event", b =>
@@ -256,14 +289,9 @@ namespace Api.Migrations
                     b.Navigation("Stands");
                 });
 
-            modelBuilder.Entity("Api.Models.Product", b =>
-                {
-                    b.Navigation("Catalogs");
-                });
-
             modelBuilder.Entity("Api.Models.Stand", b =>
                 {
-                    b.Navigation("Catalogs");
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Api.Models.User", b =>
