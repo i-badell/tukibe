@@ -33,6 +33,9 @@ public class ApiContext : DbContext
             .WithMany()
             .HasForeignKey(c => c.StandId);
 
+        modelBuilder.Entity<Cart>()
+            .HasKey(c => new { c.Id, c.StandId });
+
         modelBuilder.Entity<CartItem>()
             .HasOne(i => i.Product)
             .WithMany()
