@@ -3,7 +3,6 @@ using Api.Dto;
 using Api.Models;
 using Api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Metadata;
 
 namespace Api.Services;
 
@@ -34,16 +33,14 @@ public class EventService : IEventService
                 StandId = standId,
                 StandName = s.Name,
                 StandImageUrl = s.ImageUrl,
-                Products = s.Catalogs
-                    .Select(c => new ProductDto
-                    {
-                        ProductId = c.Product.Id,
-                        Name = c.Product.Name,
-                        Description = c.Product.Description,
-                        ImageUrl = c.Product.ImageUrl,
-                        Price = c.Price
-                    })
-                    .ToList()
+                Products = s.Products.Select(p => new ProductDto
+                {
+                    ProductId = p.Id,
+                    Name = p.Name,
+                    Description = p.Description,
+                    ImageUrl = p.ImageUrl,
+                    Price = p.Price
+                }).ToList()
             })
             .FirstOrDefaultAsync();
     }
@@ -52,8 +49,7 @@ public class EventService : IEventService
         var e = await _context.Events
             .Where(e => e.Id == eventId)
             .Include(e => e.Stands)
-            .ThenInclude(s => s.Catalogs)
-            .ThenInclude(c => c.Product)
+            .ThenInclude(c => c.Products)
             .FirstOrDefaultAsync();
 
         if (e is null)
@@ -67,21 +63,21 @@ public class EventService : IEventService
                 StandId = s.Id,
                 Name = s.Name,
                 StandImageUrl = s.ImageUrl,
-                Products = s.Catalogs
+                Products = s.Products
                     .OrderByDescending(c => c.Price)
                     .Take(5)
                     .Select(c => new ProductDto
                     {
-                        ProductId = c.Product.Id,
-                        Name = c.Product.Name,
-                        Description = c.Product.Description,
-                        ImageUrl = c.Product.ImageUrl,
+                        ProductId = c.Id,
+                        Name = c.Name,
+                        Description = c.Description,
+                        ImageUrl = c.ImageUrl,
                         Price = c.Price
                     })
                     .ToList()
             }).ToList();
 
-        EventStandsResponse response = new EventStandsResponse
+        var response = new EventStandsResponse
         {
             EventId = e.Id,
             EventName = e.Name,
@@ -129,35 +125,4 @@ public class EventService : IEventService
             .Where(e => e.Id == eventId)
             .FirstOrDefaultAsync();
     }
-}
-
-public static class Mappers
-{
-    //public static List<ProductDto> ToDto(this IEnumerable<Product> products) =>
-    //  products
-    //    .Where(p => p.InStock)
-    //    .Select(p => p.ToDto())
-    //    .ToList();
-
-
-    //public static ProductDto ToDto(this Product product) => new ProductDto
-    //{
-    //    ProductId = product.Id,
-    //    Name = product.Name,
-    //    Description = product.Description,
-    //    Price = product.Price,
-    //    ImageUrl = product.ImageUrl
-    //};
-
-
-    public static List<CategoryDto> ToDto(this IEnumerable<Category> Categories) =>
-     Categories
-       .Select(c => c.ToDto())
-       .ToList();
-
-    public static CategoryDto ToDto(this Category category) => new CategoryDto
-    {
-        Id = category.Id,
-        Name = category.Name,
-    };
 }
