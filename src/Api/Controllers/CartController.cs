@@ -25,7 +25,7 @@ public class CartController : ControllerBase
     [HttpGet]
     [ProducesResponseType<CartDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetCart(Guid standId)
+    public async Task<ActionResult<CartDto>> GetCart(Guid standId)
     {
         var standExists = await _context.Stands.AnyAsync(s => s.Id == standId);
         if (!standExists)
@@ -45,12 +45,17 @@ public class CartController : ControllerBase
     [HttpPut]
     [ProducesResponseType<Cart>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpsertCart(Guid standId, [FromBody] CartDto request)
+    public async Task<ActionResult<CartDto>> UpsertCart(Guid standId, [FromBody] CartDto request)
     {
         var stand = await _context.Stands.FirstOrDefaultAsync(s => s.Id == standId);
         if (stand is null)
         {
             return NotFound();
+        }
+
+        if (standId != request.StandId)
+        {
+            return BadRequest();
         }
 
         var cart = await _context.Carts.FirstOrDefaultAsync(c => c.StandId == standId);
@@ -83,7 +88,7 @@ public class CartController : ControllerBase
                 })];
             _context.Carts.Update(cart);
             await _context.SaveChangesAsync();
-            return Ok();
+            return Ok(cart.ToDto());
         }
 
         if (cart is not null)
