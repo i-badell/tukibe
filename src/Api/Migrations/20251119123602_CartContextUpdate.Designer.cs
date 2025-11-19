@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Api.Api.Migrations
+namespace Api.Migrations
 {
     [DbContext(typeof(ApiContext))]
-    [Migration("20251117152916_NewMigration")]
-    partial class NewMigration
+    [Migration("20251119123602_CartContextUpdate")]
+    partial class CartContextUpdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
