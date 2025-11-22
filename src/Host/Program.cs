@@ -5,10 +5,11 @@ using Scalar.Aspire;
 var builder = DistributedApplication.CreateBuilder(args);
 
 var sql = builder.AddSqlServer("tuki-db").WithLifetime(ContainerLifetime.Persistent).WithHostPort(1234);
-var db = sql.AddDatabase("client");
+var db = sql.AddDatabase("client-test");
 
 var migration = builder.AddProject<Projects.DbMigration>("DbMigration")
   .WithReference(sql)
+  .WithReference(db)
   .WaitFor(db);
 
 var api = builder.AddProject<Projects.Api>("Api")
@@ -17,18 +18,18 @@ var api = builder.AddProject<Projects.Api>("Api")
 
 builder.AddScalarApiReference(opt =>
 {
-    opt.WithTheme(ScalarTheme.Moon)
-      .WithDefaultHttpClient(ScalarTarget.JavaScript, ScalarClient.Fetch)
-      .AddPreferredSecuritySchemes("Bearer")
-      .WithPersistentAuthentication();
+  opt.WithTheme(ScalarTheme.Moon)
+    .WithDefaultHttpClient(ScalarTarget.JavaScript, ScalarClient.Fetch)
+    .AddPreferredSecuritySchemes("Bearer")
+    .WithPersistentAuthentication();
 
-    opt.Authentication = new ScalarAuthenticationOptions
-    {
-        PreferredSecuritySchemes = ["Bearer"]
-    };
+  opt.Authentication = new ScalarAuthenticationOptions
+  {
+    PreferredSecuritySchemes = ["Bearer"]
+  };
 }).WaitFor(api).WithApiReference(api, opt =>
 {
-    opt.AddDocument("v1", title: "Tuki Api Docs", routePattern: "/openapi/{documentName}.json");
+  opt.AddDocument("v1", title: "Tuki Api Docs", routePattern: "/openapi/{documentName}.json");
 });
 
 builder.Build().Run();

@@ -8,7 +8,8 @@ public sealed class Cart
 	public required DateTime UpdatedAt { get; set; }
 	public bool IsCompleted { get; set; }
 
-	public required Stand Stand { get; set; }
 	public Guid StandId { get; set; }
-	public ICollection<CartItem> Items { get; set; } = [];
+	public required Stand Stand { get; set; }
+
+	public ICollection<CartItem> Items { get; set; } = new List<CartItem>();
 }

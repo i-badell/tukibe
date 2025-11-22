@@ -26,7 +26,7 @@ public class Worker : BackgroundService
             await ctx.Database.MigrateAsync(stoppingToken);
 
             await Task.Delay(TimeSpan.FromSeconds(5));
-            var seedService = scope.ServiceProvider.GetRequiredService<ProductSeed>();
+            var seedService = scope.ServiceProvider.GetRequiredService<TestEventSeedService>();
             Guid eventId;
             Guid.TryParse(_configuration["SeedEventId"], out eventId);
             await seedService.SeedSampleEventAsync(eventId);

@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.Controllers;
 
-[Authorize]
 [ApiController]
 [Route("api/stand/{standId:guid}/cart")]
 public class CartController : ControllerBase
@@ -28,12 +27,14 @@ public class CartController : ControllerBase
     public async Task<ActionResult<CartDto>> GetCart(Guid standId)
     {
         var standExists = await _context.Stands.AnyAsync(s => s.Id == standId);
+        _logger.LogDebug($"Checking existence of stand with ID: {standId}, Exists: {standExists}", standId, standExists);
         if (!standExists)
         {
             return NotFound();
         }
 
         var cart = await _context.Carts.FirstOrDefaultAsync(c => c.StandId == standId);
+        _logger.LogDebug("cart {@cart}", cart);
         if (cart is null)
         {
             // TODO: Add error message

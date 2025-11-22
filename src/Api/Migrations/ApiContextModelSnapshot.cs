@@ -4,7 +4,6 @@ using Api.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -12,14 +11,13 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Api.Migrations
 {
     [DbContext(typeof(ApiContext))]
-    [Migration("20251117153029_NewMigrationCorrect")]
-    partial class NewMigrationCorrect
+    partial class ApiContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("client-test")
                 .HasAnnotation("ProductVersion", "9.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
@@ -28,9 +26,7 @@ namespace Api.Migrations
             modelBuilder.Entity("Api.Models.Cart", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("StandId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -39,6 +35,9 @@ namespace Api.Migrations
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("bit");
 
+                    b.Property<Guid>("StandId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -46,11 +45,11 @@ namespace Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id", "StandId");
+                    b.HasKey("Id");
 
                     b.HasIndex("StandId");
 
-                    b.ToTable("Carts");
+                    b.ToTable("Carts", "client-test");
                 });
 
             modelBuilder.Entity("Api.Models.CartItem", b =>
@@ -62,9 +61,6 @@ namespace Api.Migrations
                     b.Property<Guid>("CartId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CartStandId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uniqueidentifier");
 
@@ -73,11 +69,11 @@ namespace Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CartId");
+
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("CartId", "CartStandId");
-
-                    b.ToTable("CartItems");
+                    b.ToTable("CartItems", "client-test");
                 });
 
             modelBuilder.Entity("Api.Models.Event", b =>
@@ -96,7 +92,7 @@ namespace Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Events");
+                    b.ToTable("Events", "client-test");
                 });
 
             modelBuilder.Entity("Api.Models.Notification", b =>
@@ -134,7 +130,7 @@ namespace Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notifications", "client-test");
                 });
 
             modelBuilder.Entity("Api.Models.Product", b =>
@@ -158,7 +154,8 @@ namespace Api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal");
 
                     b.Property<Guid>("StandId")
                         .HasColumnType("uniqueidentifier");
@@ -167,7 +164,7 @@ namespace Api.Migrations
 
                     b.HasIndex("StandId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", "client-test");
                 });
 
             modelBuilder.Entity("Api.Models.Stand", b =>
@@ -190,7 +187,7 @@ namespace Api.Migrations
 
                     b.HasIndex("EventId");
 
-                    b.ToTable("Stands");
+                    b.ToTable("Stands", "client-test");
                 });
 
             modelBuilder.Entity("Api.Models.User", b =>
@@ -208,7 +205,7 @@ namespace Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", "client-test");
                 });
 
             modelBuilder.Entity("Api.Models.Cart", b =>
@@ -224,16 +221,16 @@ namespace Api.Migrations
 
             modelBuilder.Entity("Api.Models.CartItem", b =>
                 {
-                    b.HasOne("Api.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
+                    b.HasOne("Api.Models.Cart", "Cart")
+                        .WithMany("Items")
+                        .HasForeignKey("CartId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Api.Models.Cart", "Cart")
-                        .WithMany("Items")
-                        .HasForeignKey("CartId", "CartStandId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("Api.Models.Product", "Product")
+                        .WithMany("CartItems")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Cart");
@@ -290,6 +287,11 @@ namespace Api.Migrations
             modelBuilder.Entity("Api.Models.Event", b =>
                 {
                     b.Navigation("Stands");
+                });
+
+            modelBuilder.Entity("Api.Models.Product", b =>
+                {
+                    b.Navigation("CartItems");
                 });
 
             modelBuilder.Entity("Api.Models.Stand", b =>

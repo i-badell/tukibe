@@ -16,6 +16,8 @@ public class ApiContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasDefaultSchema("client-test");
+
         modelBuilder.Entity<Event>()
             .HasMany(e => e.Stands)
             .WithOne(s => s.Event);
@@ -24,32 +26,54 @@ public class ApiContext : DbContext
             .HasMany(s => s.Products)
             .WithOne(p => p.Stand);
 
+        // Cart configuration
+        modelBuilder.Entity<Cart>()
+            .HasKey(c => c.Id);
+
         modelBuilder.Entity<Cart>()
             .HasMany(c => c.Items)
-            .WithOne(i => i.Cart);
+            .WithOne(i => i.Cart)
+            .HasForeignKey(i => i.CartId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Cart>()
             .HasOne(c => c.Stand)
             .WithMany()
-            .HasForeignKey(c => c.StandId);
+            .HasForeignKey(c => c.StandId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<Cart>()
-            .HasKey(c => new { c.Id, c.StandId });
+        modelBuilder.Entity<Product>()
+            .Property(x => x.Price)
+            .HasColumnType("decimal")
+            .HasPrecision(5, 2);
+
+        modelBuilder.Entity<CartItem>()
+            .HasKey(i => i.Id);
 
         modelBuilder.Entity<CartItem>()
             .HasOne(i => i.Product)
-            .WithMany()
-            .HasForeignKey(i => i.ProductId);
+            .WithMany(p => p.CartItems)
+            .HasForeignKey(i => i.ProductId)
+            .OnDelete(DeleteBehavior.NoAction);
 
+        modelBuilder.Entity<CartItem>()
+            .HasOne(i => i.Cart)
+            .WithMany(c => c.Items)
+            .HasForeignKey(i => i.CartId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Notification configuration
         modelBuilder.Entity<Notification>()
             .HasOne(n => n.Event)
             .WithMany()
-            .HasForeignKey(n => n.EventId);
+            .HasForeignKey(n => n.EventId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Notification>()
             .HasOne(n => n.User)
             .WithMany(u => u.Notifications)
-            .HasForeignKey(n => n.UserId);
+            .HasForeignKey(n => n.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         base.OnModelCreating(modelBuilder);
     }

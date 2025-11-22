@@ -32,6 +32,24 @@ builder.Services
         options.Audience = config["Auth0Config:Audience"];
     });
 
+builder.Services.AddCors(options =>
+ {
+     options.AddPolicy("AllowSpecificOrigins", policy =>
+     {
+         policy.WithOrigins("http://localhost:3000", "http://localhost:4200") // Specify allowed origins
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+     });
+
+     // You can also define a policy to allow all origins (for development/testing)
+     options.AddPolicy("AllowAll", policy =>
+     {
+         policy.AllowAnyOrigin()
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+     });
+ });
+
 // OpenApi 
 builder.Services.AddOpenApi("v1", opt => opt.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
 
