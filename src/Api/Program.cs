@@ -9,7 +9,6 @@ var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
 
 // DI
-builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IUserService, UserService>();
 

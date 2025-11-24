@@ -18,6 +18,12 @@ public class ApiContext : DbContext
     {
         modelBuilder.HasDefaultSchema("client-test");
 
+        modelBuilder.Entity<User>()
+            .HasKey(x => x.Id);
+
+        modelBuilder.Entity<Event>()
+            .HasKey(x => x.Id);
+
         modelBuilder.Entity<Event>()
             .HasMany(e => e.Stands)
             .WithOne(s => s.Event);
@@ -25,6 +31,9 @@ public class ApiContext : DbContext
         modelBuilder.Entity<Stand>()
             .HasMany(s => s.Products)
             .WithOne(p => p.Stand);
+
+        modelBuilder.Entity<Stand>()
+            .HasKey(x => x.Id);
 
         // Cart configuration
         modelBuilder.Entity<Cart>()

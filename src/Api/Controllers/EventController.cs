@@ -1,61 +1,61 @@
+using Api.Context;
 using Api.Dto;
-using Api.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+using Api.Helpers;
+using Api.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Controllers;
 
 [ApiController]
-[Route("api/events")]
+[Route("api/events/")]
 public class EventController : ControllerBase
 {
-    private readonly IEventService _eventDataService;
+    private readonly ApiContext _apiContext;
     private readonly ILogger<EventController> _logger;
 
-    public EventController(IEventService eventDataService, ILogger<EventController> logger)
+    public EventController(ApiContext apiContext, ILogger<EventController> logger)
     {
-        _eventDataService = eventDataService;
+        _apiContext = apiContext;
         _logger = logger;
     }
 
     [HttpGet("{eventId:guid}/stands/{standId:guid}")]
     [ProducesResponseType<StandResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetFullStandData(Guid eventId, Guid standId)
+    public async Task<IActionResult> GetStand(Guid eventId, Guid standId, [FromQuery] bool includeProducts = false)
     {
-        var data = await _eventDataService.GetStandData(eventId, standId);
-        if (data == null)
+        var query = _apiContext.Stands;
+        if (includeProducts)
         {
-            return NotFound(new { ErrorMsg = "No se encontr� el evento o el stand" });
+            query.Include(x => x.Products);
         }
-        return Ok(data);
+        var stand = await query.FindAsync(eventId, standId);
+        if (stand is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(stand.ToDto());
     }
 
     [HttpGet("{eventId:guid}/stands")]
     [ProducesResponseType<EventStandsResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetEventStands(Guid eventId)
+    public async Task<IActionResult> GetEventStands(Guid eventId, [FromQuery] int numberOfProducts = 5)
     {
-        var data = await _eventDataService.GetEventStands(eventId);
-        if (data == null)
-        {
-            return NotFound(new { ErrorMsg = "No se encontr� el evento" });
-        }
-        return Ok(data);
-    }
+        var stands = await _apiContext.Stands
+            .Where(x => x.EventId == eventId)
+            .Include(x => x.Products
+                .Where(x => x.IsAvailable)
+                .OrderByDescending(x => x.Price)
+                .Take(numberOfProducts))
+            .ToListAsync();
 
-    [HttpGet("{eventId:guid}/stands/summary")]
-    [ProducesResponseType<EventStandsResponse>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetEventStandsSummary(Guid eventId)
-    {
-        var data = await _eventDataService.GetEventStandsSummary(eventId);
-        if (data == null)
+        if (stands == null)
         {
-            return NotFound(new { ErrorMsg = "No se encontr� el evento" });
+            return NotFound();
         }
-        return Ok(data);
+        return Ok(stands.ToDto());
     }
 }
