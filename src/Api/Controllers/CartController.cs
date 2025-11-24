@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Api.Controllers;
 
 [ApiController]
-[Route("api/stand/{standId:guid}/cart")]
+[Route("api/events/{eventId:guid}/stands/{standId:guid}/cart")]
 public class CartController : ControllerBase
 {
     private readonly ILogger<CartController> _logger;
@@ -24,9 +24,9 @@ public class CartController : ControllerBase
     [HttpGet]
     [ProducesResponseType<CartDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<CartDto>> GetCart(Guid standId)
+    public async Task<ActionResult<CartDto>> GetCart(Guid eventId, Guid standId)
     {
-        var standExists = await _context.Stands.AnyAsync(s => s.Id == standId);
+        var standExists = await _context.Stands.AnyAsync(s => s.Id == standId && s.EventId == eventId);
         if (!standExists)
         {
             return NotFound();
@@ -44,9 +44,9 @@ public class CartController : ControllerBase
     [HttpPut]
     [ProducesResponseType<Cart>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<CartDto>> UpsertCart(Guid standId, [FromBody] CartDto request)
+    public async Task<ActionResult<CartDto>> UpsertCart(Guid eventId, Guid standId, [FromBody] CartDto request)
     {
-        var stand = await _context.Stands.FirstOrDefaultAsync(s => s.Id == standId);
+        var stand = await _context.Stands.FirstOrDefaultAsync(s => s.Id == standId && s.EventId == eventId);
         if (stand is null)
         {
             return NotFound();

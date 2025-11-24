@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Api.Controllers;
 
 [ApiController]
-[Route("api/events/")]
+[Route("api/events/{eventId:guid}/stands")]
 public class EventController : ControllerBase
 {
     private readonly ApiContext _apiContext;
@@ -20,7 +20,7 @@ public class EventController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet("{eventId:guid}/stands/{standId:guid}")]
+    [HttpGet("{standId:guid}")]
     [ProducesResponseType<StandResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetStand(Guid eventId, Guid standId, [FromQuery] bool includeProducts = false)
@@ -39,7 +39,7 @@ public class EventController : ControllerBase
         return Ok(stand.ToDto());
     }
 
-    [HttpGet("{eventId:guid}/stands")]
+    [HttpGet]
     [ProducesResponseType<EventStandsResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetEventStands(Guid eventId, [FromQuery] int numberOfProducts = 5)
