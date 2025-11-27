@@ -1,6 +1,3 @@
 namespace Api;
 
-public class Application
-{
-    
-}
+public class Application { }

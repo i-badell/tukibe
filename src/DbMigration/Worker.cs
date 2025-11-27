@@ -1,42 +1,47 @@
-using Microsoft.EntityFrameworkCore;
 using Api.Context;
 using DbMigration.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace DbMigration;
 
 public class Worker : BackgroundService
 {
-    private readonly ILogger<Worker> _logger;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly IConfiguration _configuration;
-    public Worker(ILogger<Worker> logger, IServiceProvider serviceProvider, IConfiguration configuration)
-    {
-        _logger = logger;
-        _serviceProvider = serviceProvider;
-        _configuration = configuration;
-    }
+	private readonly ILogger<Worker> _logger;
+	private readonly IServiceProvider _serviceProvider;
+	private readonly IConfiguration _configuration;
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        try
-        {
-            await Task.Delay(TimeSpan.FromSeconds(5));
-            using var scope = _serviceProvider.CreateScope();
-            var ctx = scope.ServiceProvider.GetRequiredService<ApiContext>();
-            await ctx.Database.MigrateAsync(stoppingToken);
+	public Worker(
+		ILogger<Worker> logger,
+		IServiceProvider serviceProvider,
+		IConfiguration configuration
+	)
+	{
+		_logger = logger;
+		_serviceProvider = serviceProvider;
+		_configuration = configuration;
+	}
 
-            await Task.Delay(TimeSpan.FromSeconds(5));
-            var seedService = scope.ServiceProvider.GetRequiredService<TestEventSeedService>();
-            Guid eventId;
-            Guid.TryParse(_configuration["SeedEventId"], out eventId);
-            await seedService.SeedSampleEventAsync(eventId);
+	protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+	{
+		try
+		{
+			await Task.Delay(TimeSpan.FromSeconds(5));
+			using var scope = _serviceProvider.CreateScope();
+			var ctx = scope.ServiceProvider.GetRequiredService<ApiContext>();
+			await ctx.Database.MigrateAsync(stoppingToken);
 
-            _logger.LogInformation("Migrations y seeding success");
-        }
-        catch (Exception e)
-        {
-            _logger.LogError($"An error ocurred during migration {e}");
-        }
-        Environment.Exit(0);
-    }
+			await Task.Delay(TimeSpan.FromSeconds(5));
+			var seedService = scope.ServiceProvider.GetRequiredService<TestEventSeedService>();
+			Guid eventId;
+			Guid.TryParse(_configuration["SeedEventId"], out eventId);
+			await seedService.SeedSampleEventAsync(eventId);
+
+			_logger.LogInformation("Migrations y seeding success");
+		}
+		catch (Exception e)
+		{
+			_logger.LogError($"An error ocurred during migration {e}");
+		}
+		Environment.Exit(0);
+	}
 }

@@ -1,9 +1,9 @@
+using System.Security.Claims;
 using Api.Context;
 using Api.Controllers;
 using Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace Api.Tests;
 
@@ -33,18 +33,14 @@ public abstract class BaseControllerTest : IAsyncLifetime
 		{
 			new(ClaimTypes.NameIdentifier, "123"),
 			new(ClaimTypes.Name, "Roberto"),
-			new("user-id", TestUserId.ToString())
+			new("user-id", TestUserId.ToString()),
 		};
 		var identity = new ClaimsIdentity(claims, "TestAuth");
 		var user = new ClaimsPrincipal(identity);
 		Controller.ControllerContext = new ControllerContext
 		{
-			HttpContext = new DefaultHttpContext
-			{
-				User = user
-			}
+			HttpContext = new DefaultHttpContext { User = user },
 		};
-
 	}
 
 	public async Task DisposeAsync()
@@ -58,7 +54,7 @@ public abstract class BaseControllerTest : IAsyncLifetime
 		var claims = new[]
 		{
 			new Claim("user_id", userId ?? TestUserId.ToString()),
-			new Claim(ClaimTypes.NameIdentifier, userId ?? TestUserId.ToString())
+			new Claim(ClaimTypes.NameIdentifier, userId ?? TestUserId.ToString()),
 		};
 		var identity = new ClaimsIdentity(claims, "Test");
 		return new ClaimsPrincipal(identity);
@@ -71,7 +67,7 @@ public abstract class BaseControllerTest : IAsyncLifetime
 		{
 			Id = id,
 			Name = "Test Event",
-			ImageUrl = "https://placehold.co/200"
+			ImageUrl = "https://placehold.co/200",
 		};
 		Context.Events.Add(@event);
 		await Context.SaveChangesAsync();
@@ -95,7 +91,7 @@ public abstract class BaseControllerTest : IAsyncLifetime
 			Name = "Test Stand",
 			ImageUrl = "https://placehold.co/200",
 			EventId = testEventId,
-			Event = @event
+			Event = @event,
 		};
 		Context.Stands.Add(stand);
 		await Context.SaveChangesAsync();
@@ -104,8 +100,8 @@ public abstract class BaseControllerTest : IAsyncLifetime
 
 	protected async Task<Product> SeedProductAsync(Guid standId, string name = "Test Product")
 	{
-		var stand = await Context.Stands
-			.Include(s => s.Event)
+		var stand = await Context
+			.Stands.Include(s => s.Event)
 			.FirstOrDefaultAsync(s => s.Id == standId);
 
 		stand ??= await SeedStandAsync(standId: standId);
@@ -119,7 +115,7 @@ public abstract class BaseControllerTest : IAsyncLifetime
 			StandId = standId,
 			Stand = stand,
 			Price = 100.00m,
-			IsAvailable = true
+			IsAvailable = true,
 		};
 		Context.Products.Add(product);
 		await Context.SaveChangesAsync();
@@ -129,11 +125,7 @@ public abstract class BaseControllerTest : IAsyncLifetime
 	protected async Task<User> SeedUserAsync(Guid? userId = null)
 	{
 		var id = userId ?? TestUserId;
-		var user = new User
-		{
-			Id = id,
-			Auth0Id = $"auth0|test-{id}"
-		};
+		var user = new User { Id = id, Auth0Id = $"auth0|test-{id}" };
 		Context.Users.Add(user);
 		await Context.SaveChangesAsync();
 		return user;
@@ -164,14 +156,19 @@ public abstract class BaseControllerTest : IAsyncLifetime
 			UpdatedAt = DateTime.UtcNow,
 			IsCompleted = false,
 			StandId = testStandId,
-			Stand = stand
+			Stand = stand,
 		};
 		Context.Carts.Add(cart);
 		await Context.SaveChangesAsync();
 		return cart;
 	}
 
-	protected async Task<CartItem> SeedCartItemAsync(Guid standId, Guid cartId, Guid productId, int quantity = 1)
+	protected async Task<CartItem> SeedCartItemAsync(
+		Guid standId,
+		Guid cartId,
+		Guid productId,
+		int quantity = 1
+	)
 	{
 		var cart = await Context.Carts.FindAsync(cartId, standId);
 		var product = await Context.Products.FindAsync(productId);
@@ -186,14 +183,17 @@ public abstract class BaseControllerTest : IAsyncLifetime
 			ProductId = product.Id,
 			Quantity = quantity,
 			Cart = cart,
-			Product = product
+			Product = product,
 		};
 		Context.CartItems.Add(cartItem);
 		await Context.SaveChangesAsync();
 		return cartItem;
 	}
 
-	protected async Task<Notification> SeedNotificationAsync(Guid? eventId = null, Guid? userId = null)
+	protected async Task<Notification> SeedNotificationAsync(
+		Guid? eventId = null,
+		Guid? userId = null
+	)
 	{
 		var testEventId = eventId ?? TestEventId;
 		var testUserId = userId ?? TestUserId;
@@ -212,7 +212,7 @@ public abstract class BaseControllerTest : IAsyncLifetime
 			UserId = testUserId,
 			User = user,
 			Title = "Test Notification",
-			Message = "Test message"
+			Message = "Test message",
 		};
 		Context.Notifications.Add(notification);
 		await Context.SaveChangesAsync();

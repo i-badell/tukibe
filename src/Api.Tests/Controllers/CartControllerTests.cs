@@ -57,19 +57,22 @@ public class CartControllerTests : BaseControllerTest
 	[Fact]
 	public async Task UpsertCart_CreateNewCart_ReturnsCreatedAtAction()
 	{
-		// Arrange 
+		// Arrange
 		await SeedStandAsync(TestStandId);
 		await SeedUserAsync();
 		var product = await SeedProductAsync(TestStandId);
 		var cartDto = new CartDto
 		{
 			StandId = TestStandId,
-			Items = [new CartItemDto
-			{
-				ProductId = product.Id,
-				Quantity = 2,
-				UnitPrice = product.Price
-			}]
+			Items =
+			[
+				new CartItemDto
+				{
+					ProductId = product.Id,
+					Quantity = 2,
+					UnitPrice = product.Price,
+				},
+			],
 		};
 
 		// Act
@@ -90,7 +93,7 @@ public class CartControllerTests : BaseControllerTest
 	[Fact]
 	public async Task UpsertCart_AddItemsToExistingCart_ReturnsOk()
 	{
-		// Arrange 
+		// Arrange
 		await SeedStandAsync(TestStandId);
 		await SeedUserAsync();
 		var existingProduct = await SeedProductAsync(TestStandId);
@@ -100,12 +103,15 @@ public class CartControllerTests : BaseControllerTest
 		var cartDto = new CartDto
 		{
 			StandId = TestStandId,
-			Items = [new CartItemDto
-			{
-				ProductId = newProduct.Id,
-				Quantity = 2,
-				UnitPrice = newProduct.Price
-			}]
+			Items =
+			[
+				new CartItemDto
+				{
+					ProductId = newProduct.Id,
+					Quantity = 2,
+					UnitPrice = newProduct.Price,
+				},
+			],
 		};
 
 		// Act
@@ -117,8 +123,8 @@ public class CartControllerTests : BaseControllerTest
 		Assert.NotNull(updatedCart);
 		Assert.Equal(TestStandId, updatedCart.StandId);
 		Assert.Equal(2, updatedCart.Items.Count);
-		var cartInDb = await Context.Carts
-			.Include(c => c.Items)
+		var cartInDb = await Context
+			.Carts.Include(c => c.Items)
 			.FirstOrDefaultAsync(x => x.Id == updatedCart.Id);
 		Assert.NotNull(cartInDb);
 		Assert.Equal(2, cartInDb.Items.Count);
@@ -127,7 +133,7 @@ public class CartControllerTests : BaseControllerTest
 	[Fact]
 	public async Task UpsertCart_MergeDuplicateItems_AggregatesQuantity()
 	{
-		// Arrange 
+		// Arrange
 		await SeedStandAsync(TestStandId);
 		await SeedUserAsync();
 		var product = await SeedProductAsync(TestStandId);
@@ -136,12 +142,15 @@ public class CartControllerTests : BaseControllerTest
 		var cartDto = new CartDto
 		{
 			StandId = TestStandId,
-			Items = [new CartItemDto
-			{
-				ProductId = product.Id,
-				Quantity = 2,
-				UnitPrice = product.Price
-			}]
+			Items =
+			[
+				new CartItemDto
+				{
+					ProductId = product.Id,
+					Quantity = 2,
+					UnitPrice = product.Price,
+				},
+			],
 		};
 
 		// Act
@@ -153,8 +162,8 @@ public class CartControllerTests : BaseControllerTest
 		Assert.NotNull(updatedCart);
 		Assert.Equal(TestStandId, updatedCart.StandId);
 		Assert.Single(updatedCart.Items);
-		var cartInDb = await Context.Carts
-			.Include(c => c.Items)
+		var cartInDb = await Context
+			.Carts.Include(c => c.Items)
 			.FirstOrDefaultAsync(x => x.Id == updatedCart.Id);
 		Assert.NotNull(cartInDb);
 		Assert.Single(cartInDb.Items);
@@ -164,7 +173,7 @@ public class CartControllerTests : BaseControllerTest
 	[Fact]
 	public async Task UpsertCart_WithCompletedCart_CreatesNewCart()
 	{
-		// Arrange 
+		// Arrange
 		await SeedStandAsync(TestStandId);
 		await SeedUserAsync();
 		var product = await SeedProductAsync(TestStandId);
@@ -175,12 +184,15 @@ public class CartControllerTests : BaseControllerTest
 		var cartDto = new CartDto
 		{
 			StandId = TestStandId,
-			Items = [new CartItemDto
-			{
-				ProductId = product.Id,
-				Quantity = 2,
-				UnitPrice = product.Price
-			}]
+			Items =
+			[
+				new CartItemDto
+				{
+					ProductId = product.Id,
+					Quantity = 2,
+					UnitPrice = product.Price,
+				},
+			],
 		};
 
 		// Act
@@ -193,8 +205,8 @@ public class CartControllerTests : BaseControllerTest
 		Assert.NotEqual(completedCart.Id, newCart.Id);
 		Assert.Equal(TestStandId, newCart.StandId);
 		Assert.Single(newCart.Items);
-		var cartInDb = await Context.Carts
-			.Include(c => c.Items)
+		var cartInDb = await Context
+			.Carts.Include(c => c.Items)
 			.FirstOrDefaultAsync(x => x.Id == newCart.Id);
 		Assert.NotNull(cartInDb);
 		Assert.Single(cartInDb.Items);
@@ -206,11 +218,7 @@ public class CartControllerTests : BaseControllerTest
 	{
 		// Arrange
 		await SeedStandAsync(TestStandId);
-		var cartDto = new CartDto
-		{
-			StandId = TestStandId,
-			Items = []
-		};
+		var cartDto = new CartDto { StandId = TestStandId, Items = [] };
 
 		// Act
 		var response = await Controller.UpsertCart(Guid.NewGuid(), cartDto);
@@ -225,11 +233,7 @@ public class CartControllerTests : BaseControllerTest
 		// Arrange
 		await SeedStandAsync(TestStandId);
 		await SeedUserAsync();
-		var cartDto = new CartDto
-		{
-			StandId = TestStandId,
-			Items = []
-		};
+		var cartDto = new CartDto { StandId = TestStandId, Items = [] };
 
 		// Act
 		var response = await Controller.UpsertCart(TestStandId, cartDto);
@@ -240,9 +244,9 @@ public class CartControllerTests : BaseControllerTest
 		Assert.NotNull(createdCart);
 		Assert.Equal(TestStandId, createdCart.StandId);
 		Assert.Empty(createdCart.Items);
-		var cartInDb = await Context.Carts
-				.Include(c => c.Items)
-				.FirstOrDefaultAsync(x => x.Id == createdCart.Id);
+		var cartInDb = await Context
+			.Carts.Include(c => c.Items)
+			.FirstOrDefaultAsync(x => x.Id == createdCart.Id);
 		Assert.NotNull(cartInDb);
 		Assert.Empty(cartInDb.Items);
 	}
@@ -258,12 +262,15 @@ public class CartControllerTests : BaseControllerTest
 		var cartDto = new CartDto
 		{
 			StandId = differentStandId,
-			Items = [new CartItemDto
-			{
-				ProductId = product.Id,
-				Quantity = 2,
-				UnitPrice = product.Price
-			}]
+			Items =
+			[
+				new CartItemDto
+				{
+					ProductId = product.Id,
+					Quantity = 2,
+					UnitPrice = product.Price,
+				},
+			],
 		};
 
 		// Act
@@ -272,5 +279,4 @@ public class CartControllerTests : BaseControllerTest
 		// Assert
 		Assert.IsType<BadRequestResult>(response.Result);
 	}
-
 }

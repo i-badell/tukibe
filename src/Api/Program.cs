@@ -16,41 +16,48 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.AddSqlServerDbContext<ApiContext>("tuki-db");
 builder.EnrichSqlServerDbContext<ApiContext>();
 
-
 // AUthorization
-builder.Services
-    .AddAuthorization()
-    .AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.Authority = config["Auth0Config:Authority"];
-        options.Audience = config["Auth0Config:Audience"];
-    });
+builder
+	.Services.AddAuthorization()
+	.AddAuthentication(options =>
+	{
+		options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+		options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+	})
+	.AddJwtBearer(options =>
+	{
+		options.Authority = config["Auth0Config:Authority"];
+		options.Audience = config["Auth0Config:Audience"];
+	});
 
 builder.Services.AddCors(options =>
- {
-     options.AddPolicy("AllowSpecificOrigins", policy =>
-     {
-         policy.WithOrigins("http://localhost:3000", "http://localhost:4200") // Specify allowed origins
-               .AllowAnyHeader()
-               .AllowAnyMethod();
-     });
+{
+	options.AddPolicy(
+		"AllowSpecificOrigins",
+		policy =>
+		{
+			policy
+				.WithOrigins("http://localhost:3000", "http://localhost:4200") // Specify allowed origins
+				.AllowAnyHeader()
+				.AllowAnyMethod();
+		}
+	);
 
-     // You can also define a policy to allow all origins (for development/testing)
-     options.AddPolicy("AllowAll", policy =>
-     {
-         policy.AllowAnyOrigin()
-               .AllowAnyHeader()
-               .AllowAnyMethod();
-     });
- });
+	// For testing purposes, allow all origins
+	options.AddPolicy(
+		"AllowAll",
+		policy =>
+		{
+			policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+		}
+	);
+});
 
-// OpenApi 
-builder.Services.AddOpenApi("v1", opt => opt.AddDocumentTransformer<BearerSecuritySchemeTransformer>());
+// OpenApi
+builder.Services.AddOpenApi(
+	"v1",
+	opt => opt.AddDocumentTransformer<BearerSecuritySchemeTransformer>()
+);
 
 builder.Services.AddControllers();
 
@@ -58,21 +65,23 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    app.MapScalarApiReference(opt =>
-    {
-        opt.WithTheme(ScalarTheme.Moon)
-          .WithDefaultHttpClient(ScalarTarget.JavaScript, ScalarClient.Fetch)
-          .AddPreferredSecuritySchemes("Bearer")
-          .WithPersistentAuthentication();
+	app.MapOpenApi();
+	app.MapScalarApiReference(opt =>
+	{
+		opt.WithTheme(ScalarTheme.Moon)
+			.WithDefaultHttpClient(ScalarTarget.JavaScript, ScalarClient.Fetch)
+			.AddPreferredSecuritySchemes("Bearer")
+			.WithPersistentAuthentication();
 
-        opt.Authentication = new ScalarAuthenticationOptions
-        {
-            PreferredSecuritySchemes = ["Bearer"]
-        };
-    });
+		opt.Authentication = new ScalarAuthenticationOptions
+		{
+			PreferredSecuritySchemes = ["Bearer"],
+		};
+	});
+	app.UseCors("AllowAll");
 }
 
+app.UseCors("AllowSpecificOrigins");
 app.UseMiddleware<ExceptionMiddleware>();
 
 app.MapControllers();
